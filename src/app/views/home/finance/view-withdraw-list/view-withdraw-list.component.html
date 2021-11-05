@@ -1,0 +1,366 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzType="primary" (click)="export(1)" nzSize="small">导出当前搜索内容</button> &nbsp;&nbsp;
+    <button nz-button class="top-button" nzType="primary" (click)="export(0)" nzSize="small"><i nz-icon
+        nzType="download"></i>导出当前页</button>
+    <nz-input-group nzCompact class="refresh">
+      <label nz-checkbox [(ngModel)]="refreshFlag" (ngModelChange)="refresh($event)">自动刷新</label>
+      <nz-select nzSize="small" [(ngModel)]="refreshRate" style="width: 100px;" nzPlaceHolder="请选择刷新频率 默认5秒/次">
+        <nz-option nzLabel="5秒/次" [nzValue]="5000"></nz-option>
+        <nz-option nzLabel="10秒/次" [nzValue]="10000"></nz-option>
+        <nz-option nzLabel="20秒/次" [nzValue]="20000"></nz-option>
+      </nz-select>
+    </nz-input-group>
+    <section class="main-content">
+      <section class="select-lottery serach-tpl">
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">用户名:</span>
+          <input nz-input placeholder="用户名" [(ngModel)]="searchData['username']" class="tpl-input"
+            nzSize="small" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">订单编号:</span>
+          <input nz-input placeholder="订单编号" [(ngModel)]="searchData['order_id']" class="tpl-input"
+            nzSize="small" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">认领人:</span>
+          <input nz-input placeholder="认领人" [(ngModel)]="searchData['claim_admin_id']" class="tpl-input"
+            nzSize="small" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">处理人:</span>
+          <input nz-input placeholder="处理人" [(ngModel)]="searchData['check_admin_id']" class="tpl-input"
+            nzSize="small" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">状态:</span>
+          <nz-select [(ngModel)]="searchData['status']" nzAllowClear nzPlaceHolder="请选择状态" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option *ngFor="let key of detailsStatus | objkeys" [nzValue]="key" [nzLabel]="detailsStatus[key]"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">网络地址:</span>
+          <input nz-input placeholder="网络地址" [(ngModel)]="searchData['client_ip']" class="tpl-input"
+            nzSize="small" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">银行名称:</span>
+          <nz-select [(ngModel)]="searchData['bank_sign']" nzAllowClear nzPlaceHolder="银行名称" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option *ngFor="let item of bankSignOption" [nzValue]="item.key" [nzLabel]="item.label"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">金额区间:</span>
+          <nz-input-group nzCompact class="tpl-input" nzSize="small">
+            <input type="text" nz-input [(ngModel)]="searchData['min']" style="width:92px;" placeHolder="金额最小"
+              nzSize="small" />-
+            <input type="text" nz-input [(ngModel)]="searchData['max']" style="width:92px;" placeHolder="金额最大"
+              nzSize="small" />
+          </nz-input-group>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa tpl-list-time">
+          <span class="tpl-title tpl-title-search">申请时间:</span>
+          <nz-range-picker nzSize="small" [(ngModel)]="requestTime" (click)="requestTimeHandle()"
+            (ngModelChange)="onRequestChange($event)" nzShowTime>
+          </nz-range-picker>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa tpl-list-time">
+          <span class="tpl-title tpl-title-search">成功时间:</span>
+          <nz-range-picker nzSize="small" [(ngModel)]="checkTime" (click)="checkTimeHandle()"
+            (ngModelChange)="oncCheckChange($event)" nzShowTime>
+          </nz-range-picker>
+        </section>
+        <section class="tpl-list flexa">
+          <button nz-button nzType="primary" class="select-search" (click)="serach()" nzSize="small"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" class="select-reset" (click)="resetSearch()" nzSize="small"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>
+
+      </section>
+      <nz-table nzShowQuickJumper [nzPageSize]="searchData.page_size" [nzShowPagination]="false" #tableData
+        [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>ID</th>
+            <th nzWidth="8%">用户名</th>
+            <th nzWidth="7%">订单号</th>
+            <th>FMIS订单号</th>
+            <th nzWidth="5%">提现金额</th>
+            <th nzWidth="5%">实际金额</th>
+            <th nzWidth="8%">银行</th>
+            <th nzWidth="5%">认领人</th>
+            <th>处理人</th>
+            <th>发起时间</th>
+            <th>认领时间</th>
+            <th>处理时间</th>
+            <th>成功时间</th>
+            <th nzWidth="8%">请求IP</th>
+            <th>提现备注</th>
+            <th nzWidth="6%">状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-item let-i="index" [ngForOf]="tableList">
+            <tr [class]="item.status === 0 && !newDataFous[i]? 'newData' : ''" (click)="lockTd($event)" (mouseenter)="listEnter($event, i)">
+              <td>{{item.id}}</td>
+              <td>{{item.username}}</td>
+              <td>{{item.order_id}}</td>
+              <td>{{item.pay_order_id}}</td>
+              <td>{{item.amount}}</td>
+              <td>{{item.real_amount}}</td>
+              <td>{{item.bank_name}}</td>
+              <td>{{item.claim_admin_id}}</td>
+              <td>{{item.check_admin_id}}</td>
+              <td>{{item.request_time}}</td>
+              <td>{{item.claim_time}}</td>
+              <td>{{item.wind_process_time}}</td>
+              <td>{{item.process_time}}</td>
+              <td>{{item.client_ip}}</td>
+              <td>
+                <p id="text-content">
+                  {{item.mark}}
+                </p>
+              </td>
+              <td>
+                <span *ngIf='[0].includes(item.status)'>
+                  等待审核
+                </span>
+                <span *ngIf='[1].includes(item.status)' style="color: dodgerblue;">
+                  领取审核
+                </span>
+                <span *ngIf='[2,3,6,7,8,9].includes(item.status)' style="color: green;">
+                  审核成功
+                </span>
+                <span *ngIf='[4, 5].includes(item.status)' style="color: green;">
+                  提现成功
+                </span>
+                <span *ngIf='[-2,-4,-5,-6].includes(item.status)' style="color: red;">
+                  提现失败
+                </span>
+                <span *ngIf='[-3].includes(item.status)' style="color: red;">
+                  代付失败
+                </span>
+              </td>
+              <td>
+                <button nz-button nzSize="small" nzType="primary" (click)="details(item)" nzSize="small">详情</button>
+                <button nz-button nzSize="small" nzType="primary" (click)="check(item, true)"
+                  *ngIf="[0,1].includes(item.status)" nzSize="small">接手处理</button>
+                <button nz-button nzSize="small" nzType="primary" (click)="doHand(item)"
+                  *ngIf="[0, 1, 2, 3, 4, -2, -3, -4].includes(item.status)"
+                  nzSize="small">人工</button>
+            </tr>
+          </ng-template>
+          <tr>
+            <td colspan="3" style="color: green;">本页统计:</td>
+            <td></td>
+            <td>{{pageAmount}}</td>
+            <td>{{pageRealAmount}}</td>
+            <td colspan="7"></td>
+          </tr>
+          <tr>
+            <td colspan="3" style="color: green;">总计:</td>
+            <td></td>
+            <td>{{totalAmount}}</td>
+            <td>{{totalRealAmount}}</td>
+            <td colspan="7"></td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='searchData.page_size' [nzTotal]="page.total"
+        [(nzPageIndex)]="searchData.page_index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper
+        class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<!-- 审核 -->
+<nz-drawer [nzClosable]="checkData.show" [nzVisible]="checkData.show" [nzMaskClosable]='false' nzWidth='90%'
+  nzPlacement="right" nzTitle="审核" (nzOnClose)="checkData.show = false">
+
+  <div nz-row style="margin-bottom:2rem">
+    <!-- [nzColumn]='{ xxl: 3, x3: 3, lg: 3, md: 3, sm: 3, xs: 3 }' -->
+    <nz-descriptions nzBordered>
+      <nz-descriptions-item nzTitle="用户状态">{{checkData.user['frozen_type']}}</nz-descriptions-item>
+    </nz-descriptions>
+  </div>
+  <div nz-row style="margin-bottom:2rem;">
+    <!-- [nzColumn]='{ xxl: 3, x3: 3, lg: 3, md: 3, sm: 3, xs: 3 }' -->
+    <section [class]="checkData.user['mark'] !== '' ? 'userMark' : ''">
+      <span class="tpl-title tpl-title-search">提现备注:</span>
+      {{checkData.user['mark']}}
+    </section>
+  </div>
+  <div nz-row>
+    <div nz-col nzSpan="7">
+      <nz-descriptions nzSize="small" [nzColumn]='{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }' nzBordered>
+        <nz-descriptions-item nzTitle="提现编号">{{checkData.order['order_id']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="用户名">{{checkData.user['username']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="是否测试用户">{{checkData.user['is_tester'] == 1 ? '是' : '否'}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="所属总代">{{checkData.user['partner_sign']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="提现审核时间">{{checkData.order['check_time']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="金额">{{checkData.order['amount']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="卡号">{{checkData.order['card_number']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="户名">{{checkData.order['owner_name']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="省">{{checkData.order['region_name']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="开户行">{{checkData.order['branch']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="开户行地址">{{checkData.order['card_city']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="提现失败备注">{{checkData.order['desc']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="审核备注">{{checkData.order['description']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="状态">{{detailsStatus[checkData.order['status']]}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="认领人">{{checkData.order['claim_admin_id']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="审核管理员">{{checkData.order['check_admin_id']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="认领时间">{{checkData.order['claim_time']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="审核时间">{{checkData.order['check_time']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="到账时间">{{checkData.order['process_time']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="手续费" class="cred">{{checkData.order['fee_amount']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="实际汇款金额">{{checkData.order['real_amount']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="提现渠道">{{checkData.order['channel_sign']}}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="网络地址">{{checkData.order['client_ip']}}</nz-descriptions-item>
+      </nz-descriptions>
+    </div>
+    <div nz-col nzSpan="17">
+      <div nz-row>
+        <nz-descriptions nzSize="small"  nzBordered>
+          <nz-descriptions-item nzTitle="用户余额">
+            {{ (checkData.account['balance'] - 0) + (checkData.account['frozen'] - 0)}}
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="可用余额">{{toolService.toFixed(checkData.account['balance'], 3)}}
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="可提现余额">
+            {{toolService.toFixed(+checkData.account['withdrawable_balance'], 3)}}
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="当天充值金额">{{checkData.account['total_today_recharge']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="当天提现金额">{{checkData.account['total_today_withdraw']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="当天投注额">{{checkData.account['total_today_cost']}}</nz-descriptions-item>
+        </nz-descriptions>
+      </div>
+      <div nz-rows class="fw" style="padding:30px 0 20px;">
+        <div nz-col nzSpan="10" nzOffset='1' style="width:300px;">
+          <nz-form-label>开始时间</nz-form-label>
+          <nz-date-picker nzPlaceHolder="选择开始时间" [(ngModel)]="detailsTimes['start_time']" nzFormat="yyyy-MM-dd HH:mm:ss">
+          </nz-date-picker>
+        </div>
+        <div nz-col nzSpan="10" style="width:300px;">
+          <nz-form-label>截止时间</nz-form-label>
+          <nz-date-picker nzPlaceHolder="选择截止时间" [(ngModel)]="detailsTimes['end_time']" nzFormat="yyyy-MM-dd HH:mm:ss">
+          </nz-date-picker>
+        </div>
+        <div nz-col nzSpan="2" style="margin-top: 2px;">
+          <button nz-button nzType="primary" (click)='detailsSearch()'>搜索</button>
+        </div>
+      </div>
+      <div nz-row class="fw clear">
+        <nz-descriptions nzSize="small" nzBordered>
+          <nz-descriptions-item nzTitle="充值合计">{{checkData.stat['recharge_amount']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="在线充值">{{checkData.stat['recharge_online']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="充值理赔">{{checkData.stat['recharge_claim']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="转入">{{checkData.stat['transfer_from_parent']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="提现">{{checkData.stat['withdraw_amount']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="投注额">{{checkData.stat['total_bet']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="奖金派送">{{checkData.stat['bonus']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="游戏盈亏">{{checkData.stat['profit']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="投注返点">{{checkData.stat['commission_from_bet']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="下级返点">{{checkData.stat['commission_from_child']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="日工资">{{checkData.stat['salary']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="分红">{{checkData.stat['dividend']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="红包理赔">{{checkData.stat['red_envelope_claim']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="活动礼金">{{checkData.stat['gift']}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="充投比">{{checkData.stat['recharge_withdraw_ratio']}}</nz-descriptions-item>
+        </nz-descriptions>
+      </div>
+
+      <section class="drawer-box" style="padding: 80px 0 0 100px;" *ngIf="checkData.audit">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">提现要求:</span>
+          <section class="tpl-input" style="width: 400px;">
+            要求:<span class="cred"> {{checkData.withdrawNeedBetTimes}} </span>倍流水, 实际:<span class="cred">
+              {{checkData.order.amount * checkData.withdrawNeedBetTimes}} </span>
+            (
+            <span *ngIf="+checkData.account['bet_times'] >= +checkData.withdrawNeedBetTimes"
+              class="cgreen">符合流水条件</span>
+            <span *ngIf="+checkData.account['bet_times'] < +checkData.withdrawNeedBetTimes" class="cred">不符合流水条件</span>
+            )
+          </section>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">提现金额:</span>
+          <span class="tpl-input cblue">{{checkData.order.amount}}</span>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">结果:</span>
+          <nz-select class="tpl-input" [(ngModel)]="submitCheckDatas['status']" nzAllowClear nzPlaceHolder="结果">
+            <nz-option *ngFor="let item of checkData.status_options | keyvalue" nzValue="{{item.key}}"
+              nzLabel="{{item.value}}"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">原因:</span>
+          <input nz-input placeholder="请输入原因" class="tpl-input" [(ngModel)]="submitCheckDatas['reason']" />
+        </section>
+        <!--   <section class="tpl-list flexa">
+                  <span class="tpl-title">资金密码:</span>
+                  <input nz-input type="password" placeholder="请输入资金密码" class="tpl-input"
+                    [(ngModel)]="checkData.data.fund_password" />
+                </section> -->
+        <button nz-button nzType="primary" (click)="submitCheckData()" class="submit" style="margin-left: 115px;">
+          提交
+        </button>
+      </section>
+    </div>
+  </div>
+</nz-drawer>
+
+
+<nz-modal nzTitle="处理" (nzOnOk)="subHank()" nzWidth="35rem" [nzVisible]="handPop.show"
+  (nzOnCancel)="handPop.show = false">
+  <section class="tpl-lists tpl-lists-handPop">
+    <section class="tpl-list flexa">
+      <span class="tpl-title">类型:</span>
+      <nz-select style="width: 200px;" [(ngModel)]="handPop.data['type']" [nzPlaceHolder]="'请选择类型'">
+        <nz-option nzValue="-5" nzLabel="手动失败"></nz-option>
+      </nz-select>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">原因:</span>
+      <input nz-input placeholder="请输入原因" class="tpl-input" [(ngModel)]="handPop.data['reason']" />
+    </section>
+    <!-- <section class="tpl-list flexa">
+        <span class="tpl-title">金额:</span>
+        <input nz-input placeholder="请输入金额" class="tpl-input" [(ngModel)]="handPop.data['amount']" />
+      </section> -->
+  </section>
+</nz-modal>
+
+<nz-modal
+[(nzVisible)]="contentPop.show"
+[nzCancelText]="null"
+[nzOkText]="null"
+nzTitle="内容提示" 
+(nzOnCancel)="contentPop.show = false">
+  <section class="fw content" [innerHtml]="contentPop.data"></section>
+</nz-modal>
+
+
+<nz-modal [(nzVisible)]="exportPop.show" nzTitle="导出" (nzOnCancel)="exportPop.show = false" [nzOkText]="null"
+  [nzCancelText]="null">
+  <ng-container *ngIf="!exportPop.loading; else elseTemplate">
+    <section class="export-content">
+      <button nz-button nzType="primary" nzSize="large" style="width: 47.5rem" (click)="exportAllPage()"><i nz-icon
+          nzType="download"></i>Download</button>
+    </section>
+  </ng-container>
+  <ng-template #elseTemplate>
+    <section class="export-content">
+      <button nz-button nzType="primary" nzSize="large" style="width: 47.5rem" (click)="stopDownload()"><i nz-icon
+          [nzType]="'sync'" [nzSpin]="true"></i>停止下载</button>
+    </section>
+  </ng-template>
+</nz-modal>

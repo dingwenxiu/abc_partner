@@ -1,0 +1,74 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="select-lottery serach-tpl">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">用户ID:</span>
+        <input nz-input placeholder="用户ID" nzSize="small" [(ngModel)]="searchData['user_id']" class="tpl-input"/>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">用户名:</span>
+        <input nz-input placeholder="用户名" nzSize="small" [(ngModel)]="searchData['username']" class="tpl-input"/> &nbsp;&nbsp;
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">每页数量:</span>
+        <nz-select  nzSize="normal" style="width: 200px;" nzSize="small" [(ngModel)]="page.size" nzAllowClear nzPlaceHolder="选择每页显示数量" class="tpl-input">
+          <nz-option  nzValue="10" nzLabel="每页10条"></nz-option>
+          <nz-option  nzValue="15" nzLabel="每页15条"></nz-option>
+          <nz-option  nzValue="20" nzLabel="每页20条"></nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa tpl-list-time">
+        <span class="tpl-title">时间:</span>
+        <nz-range-picker [(ngModel)]="searchTime" nzSize="small" (ngModelChange)="onChange($event)" (click)="timeHandle()"></nz-range-picker> &nbsp;
+        <button nz-button nzType="primary" nzSize="small" (click)="search()">搜索</button> &nbsp;
+        <button nz-button nzType="primary" nzSize="small" (click)="refresh()">全部显示</button>
+      </section>
+    </section>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>用户ID</th>
+            <th>用户名</th>
+            <th>平台</th>
+            <th>IP</th>
+            <th>代理IP</th>
+            <th>创建时间</th>
+            <th>更新时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.user_id}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.platform}}</td>
+            <td>{{item.ip}}</td>
+            <td>{{item.proxy_ip}}</td>
+            <td>{{item.created_at}}</td>
+            <td>{{item.updated_at}}</td>
+            <td>
+              <button nz-button nzType="primary" (click)="detail(item)" nzSize="small">详情</button>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='page.size || api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<nz-modal 
+nzTitle = "详情"
+[nzCancelText]="null"
+[nzOkText]="null"
+nzWidth="100rem"
+[nzVisible] = "detailPop.show"
+(nzOnCancel) = "detailPop.show = false">
+  <section class="tpl-lists">
+    <nz-descriptions nzBordered>
+      <nz-descriptions-item *ngFor="let item of detailPop.data | keyValueDel" [nzTitle]="item[0]">{{item[1]}}</nz-descriptions-item>
+    </nz-descriptions>
+  </section>
+</nz-modal>

@@ -1,0 +1,119 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+        <section class="select-lottery serach-tpl">
+            <section class="tpl-list flexa">
+              <span class="tpl-title">用户名:</span>
+              <input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData['username']" class="tpl-input" />&nbsp;&nbsp;
+            </section>
+            <section class="tpl-list flexa">
+                <span class="tpl-title">上级用户:</span>
+                <input nz-input nzSize="small" placeholder="上级用户名ID" [(ngModel)]="searchData['parent_id']" class="tpl-input" />&nbsp;&nbsp;
+              </section>
+            <section class="tpl-list flexa tpl-list-time">
+              <span class="tpl-title">时间:</span>
+              <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)" (click)="timeHandle()" nzShowTime></nz-range-picker>&nbsp;&nbsp;
+            </section>
+            <section class="tpl-list flexa">
+                <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="doSearch()"><i nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+                <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon type="sync"></i>重置</button>
+            </section>
+          </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" #tableData [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>ID</th>
+            <th>用户名</th>
+            <th>日期</th>
+            <th>比列</th>
+            <th>总投注</th>
+            <th>个人投注</th>
+            <th>总工资</th>
+            <th>下级工资</th>
+            <th>个人工资</th>
+            <th>实际金额</th>
+            <th>发送时间</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-data [ngForOf]="tableList">
+            <tr>
+              <td>{{data.id}}</td>
+              <td>{{data.username}}</td>
+              <td>{{data.day}}</td>
+              <td><span>{{data.rate}}%</span></td>
+              <td>{{data.total_bets}}</td>
+              <td>{{data.self_bets}}</td>
+              <td>{{data.total_salary }}</td>
+              <td>{{data.child_salary}}</td>
+              <td>{{data.self_salary}}</td>
+              <td><span style="color: blue;">{{data.real_salary}}</span></td>
+              <td>{{data.send_time}}</td>
+              <td>
+                <span *ngIf="data.status == '0'">初始化</span>
+                <span *ngIf="data.status == '1'">已统计</span>
+                <span *ngIf="data.status == '2'">已发放</span>
+              </td>
+              <td>
+                <a *ngIf="data.status == '1'" (click)="doSend(data)">人工发放</a>
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </nz-table>
+
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper
+                     class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<nz-modal
+  nzTitle = "发放日工资"
+  nzWidth="660"
+  [nzOkText]="null"
+  [nzCancelText]="null"
+  [nzOkDisabled]="true"
+  [nzCancelDisabled]="true"
+  [nzVisible] = "sendData.show"
+  (nzOnCancel) = "sendData.show = false">
+  <section class="tpl-lists">
+    <section class="tpl-list flexa">
+      <span class="tpl-title" style="width: 120px;">用户名:</span>
+      <span>{{sendData.item.username}}</span>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title" style="width: 120px;">总投注:</span>
+      <span>{{sendData.item.self_real_bet + sendData.item.team_real_bet}}</span>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title" style="width: 120px;">应发工资:</span>
+      <span>{{sendData.item.total_salary}} - {{sendData.item.child_salary}} = {{sendData.item.self_salary}}</span>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title" style="width: 120px;">发放金额:</span>
+      <nz-input-number [(ngModel)]="sendData.data.amount" [nzMin]="1" [nzStep]="1" style="width: 200px;"></nz-input-number>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title" style="width: 120px;">资金密码:</span>
+      <nz-input-group   style="width: 200px;" [nzSuffix]="suffixTemplate" >
+        <input
+          [type]="passwordVisible ? 'text' : 'password'"
+          nz-input
+          placeholder="资金密码"
+          [(ngModel)]="sendData.data.fund_password"
+        />
+      </nz-input-group>
+      <ng-template #suffixTemplate>
+        <i nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'" (click)="passwordVisible = !passwordVisible"></i>
+      </ng-template>
+    </section>
+    <button nz-button nzType="primary" (click)="doSubmitSend()"  [nzLoading]="sendData.loading" class="submit">
+      提交
+    </button>
+  </section>
+</nz-modal>
+

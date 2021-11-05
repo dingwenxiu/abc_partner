@@ -1,0 +1,22 @@
+@import '../../style.css';
+.rule-details .tpl-input{
+    width:60px;
+}
+.rule-details-list-con{
+    margin-right: 10px;
+    float: left;
+    text-align:center;
+}
+.rule-details-box .primary{
+    position: absolute;
+    top: 33px;
+    left: 360px;
+}
+.rule-details-primary{
+    padding-top: 29px;
+    cursor: pointer;
+}
+
+.text-content {
+    max-width: 100px;
+}

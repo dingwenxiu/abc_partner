@@ -1,0 +1,54 @@
+@import '../../style.css';
+
+.share{
+  padding:10px 0;
+}
+.qr-code{
+  margin:0 auto;
+  width:130px;
+  height:130px;
+}
+.fasts{
+  font-family: cursive;
+  line-height: 30px;
+  font-size: 15px;
+  padding-left: 20px;
+  list-style: disc;
+  color: #333;
+}
+.fasts .a-link{
+  vertical-align:unset ;
+}
+
+
+.select-lottery{
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.tpl-title-search{
+  width: 100px;
+}
+
+.tpl-list{
+  width: 290px;
+}
+.tpl-list-time{
+  width: 460px;
+}
+
+.tpl-input{
+  width: 400px;
+}
+.tpl-title{
+  width: 150px;
+}
+
+.verify{
+  position: absolute;
+  transform: translate(70px, 30px);
+}
+
+::ng-deep .verify .ant-alert-error{
+  background-color: transparent !important;
+}

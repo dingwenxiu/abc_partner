@@ -1,0 +1,58 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="4%">用户ID</th>
+            <th nzWidth="6%">帐号</th>
+            <th>从属</th>
+            <th>API</th>
+            <th>IP</th>
+            <th>平台下标</th>
+            <th>创建时间</th>
+            <th>操作时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.user_id}}</td>
+            <td>
+                <a href="javascript:;" class="a-link" (click)="findChild(item.id)">{{item.username}}</a>
+            </td>
+            <td>{{item.from}}</td>
+            <td>{{item.api}}</td>
+            <td>{{item.ip}}</td>
+            <td>{{item.platform_sign}}</td>
+            <td>{{item.created_at}}</td>
+            <td>{{item.updated_at}}</td>
+            <td>
+              <button nz-button nzType="primary" (click)="detail(item)" nzSize="small">详情</button>
+                <!-- <a href="javascript:;" class="a-link" (click)="doPassword(item)">密码</a>
+                <a href="javascript:;" class="a-link" (click)="doTransfer(item.id)">资金</a>
+                <a href="javascript:;" class="a-link" (click)="doFrozen(item.id)">冻结</a>&nbsp;
+              <nz-switch [(ngModel)]="item.status" [nzControl]='true' (click)="doStatus(item)" nzCheckedChildren="开" nzUnCheckedChildren="关" class="switch"></nz-switch> -->
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<nz-modal 
+nzTitle = "详情"
+[nzCancelText]="null"
+[nzOkText]="null"
+nzWidth="100rem"
+[nzVisible] = "detailPop.show"
+(nzOnCancel) = "detailPop.show = false">
+  <section class="tpl-lists">
+    <nz-descriptions nzBordered>
+      <nz-descriptions-item *ngFor="let item of detailPop.data | keyValueDel" [nzTitle]="item[0]">{{item[1]}}</nz-descriptions-item>
+    </nz-descriptions>
+  </section>
+</nz-modal>

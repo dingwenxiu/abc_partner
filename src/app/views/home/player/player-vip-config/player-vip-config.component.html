@@ -1,0 +1,109 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzType="primary" nzSize="small" (click)="addVip()">添加会员等级</button>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">ID</th>
+            <th>等级名称</th>
+            <th>显示名称</th>
+            <th>会员等级</th>
+            <th>充值金额</th>
+            <th>会员图标</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-item [ngForOf]="tableList" let-i="index">
+            <tr>
+              <td>{{item.id}}</td>
+              <td>{{item.name}}</td>
+              <td>{{item.show_name}}</td>
+              <td>{{item.vip_level}}</td>
+              <td>{{item.recharge_total}}</td>
+              <td>
+                <img style="width: 50px;" [src]="api.imgUrl + item.icon" alt="会员图标">
+              </td>
+              <td>
+                <button nzSize="small" nz-button nzType="primary" (click)="toDetail(item)">详情</button>&nbsp;
+                <button nzSize="small" nz-button nzType="primary" (click)="toEdit(item)">编辑</button>&nbsp;
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<nz-modal 
+nzTitle = "详情"
+[nzCancelText]="null"
+[nzOkText]="null"
+nzWidth="100rem"
+[nzVisible] = "detailPop.show"
+(nzOnCancel) = "detailPop.show = false">
+  <section class="tpl-lists">
+    <nz-descriptions nzBordered>
+      <nz-descriptions-item nzTitle="ID">{{detailPop.data['id']}}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="会员等级">{{detailPop.data['vip_level']}}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="名称">{{detailPop.data['name']}}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="显示名称">{{detailPop.data['show_name']}}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="图标路径">
+          <img [src]="api.imgUrl + detailPop.data['icon']" alt="图标路径" style="max-width: 50px;">
+      </nz-descriptions-item>
+      <nz-descriptions-item nzTitle="创建时间">{{detailPop.data['created_at']}}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="更新时间">{{detailPop.data['updated_at']}}</nz-descriptions-item>
+      <!-- <nz-descriptions-item *ngFor="let item of detailPop.data | keyValueDel" [nzTitle]="item[0]">
+        <span *ngIf="item[0] !== '图标路径'">{{item[1]}}</span>
+        <img *ngIf="item[0] === '图标路径'" [src]="item[1]" alt="图标路径" style="max-width: 50px;">
+      </nz-descriptions-item> -->
+    </nz-descriptions>
+  </section>
+</nz-modal>
+
+<nz-modal 
+nzTitle = "设置"
+nzWidth="35rem"
+(nzOnOk) = "subConfig()"
+[nzVisible] = "addPop.show"
+(nzOnCancel) = "addPop.show = false">
+  <section class="tpl-list flexa">
+    <span class="tpl-title">会员等级:</span>
+    <nz-input-number [(ngModel)]="addPop.data['vip_level']" [nzMin]="1" [nzStep]="1" nzPlaceHolder="请输入会员等级" class="tpl-input">
+    </nz-input-number>
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">会员等级名称:</span>
+    <input nz-input placeholder="会员等级名称" [(ngModel)]="addPop.data['name']" class="tpl-input"/>&nbsp;&nbsp;
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">会员显示名称:</span>
+    <input nz-input placeholder="会员显示名称" [(ngModel)]="addPop.data['show_name']" class="tpl-input"/>&nbsp;&nbsp;
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">充值金额:</span>
+    <input nz-input placeholder="充值金额" [(ngModel)]="addPop.data['recharge_total']" class="tpl-input"/>&nbsp;&nbsp;
+  </section>
+  <section class="tpl-list flexa" *ngIf="!addPop.data['icon']">
+    <span class="tpl-title">会员图片:</span>
+    <ng-container *ngIf="addPop.data['name'] && addPop.data['name'].length > 2; else elseVipImg">
+      <nz-upload [nzAction]="api.uploadImg" [nzData] = "{type: 3, test: 0, upload_type: 'vipImg', img_new_name: addPop.data['name']}" (nzChange)='upImages($event)'>
+        <button nz-button><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+      </nz-upload>
+    </ng-container>
+    <ng-template #elseVipImg>
+      请先填写完整会员等级名称
+    </ng-template>
+  </section>
+  <section class="tpl-list flexa" *ngIf="addPop.data['icon']">
+    <span class="tpl-title">会员图片:</span>
+    <section class="img-box">
+      <img style="max-height: 100px;max-width: 100px;" [src]="api.imgUrl + addPop.data['icon']">
+      <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="deleteImg()"></i>
+    </section>
+  </section>
+</nz-modal>

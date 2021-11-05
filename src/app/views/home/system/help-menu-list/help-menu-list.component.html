@@ -1,0 +1,133 @@
+<nz-content style="margin:0 16px;">
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+      <section class="main-content">
+        <section class="select-lottery serach-tpl">
+          <section class="tpl-list flexa">
+            <span class="tpl-title">操作描述:</span>
+            <input nz-input placeholder="操作描述" nzSize="small" [(ngModel)]="searchData['desc']" class="tpl-input" />&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa">
+            <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon type="search"></i>搜索</button>&nbsp;&nbsp;
+            <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon type="sync"></i>重置</button>
+          </section>
+        </section>
+        <button nz-button nzSize="small" nzType="primary" (click)="add()" style="margin-bottom: 10px;">添加帮助内容</button>
+        <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+          <thead class="ant-table-thead">
+            <tr>
+              <th>主目录ID</th>
+              <th>主目录名</th>
+              <th>子目录ID</th>
+              <th>子目录名</th>
+              <th>子目录内容</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody class="ant-table-tbody">
+            <tr *ngFor="let item of tableList" (click)="lockTd($event)">
+              <td>{{item['pid']}}</td>
+              <td>{{item['name']}}</td>
+              <td>{{item['id']}}</td>
+              <td>{{item['title']}}</td>
+              <td>
+                <p class="text-content" [innerHtml]="item.content"></p>
+              </td>
+              <td>
+                  <button nz-button nzSize="small" nzType="primary" (click)="edit(item)" >编辑</button>
+                  <button nz-button nzSize="small" nzType="primary" (click)="delete(item.id)" >删除</button>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+        <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+        </nz-pagination>
+      </section>
+    </section>
+  </nz-content>  
+
+<!-- <nz-modal 
+nzTitle = "添加"
+nzWidth="50rem"
+[nzVisible] = "addPop.show"
+(nzOnCancel) = "addPop.show = false"
+(nzOnOk) = "addSub()"
+[nzOkLoading] = "api.loadingSwitch">
+  <section class="tpl-lists">
+    <section class="tpl-list flexa">
+      <span class="tpl-title">菜单:</span> 
+      <nz-select style="width: 250px;" [(ngModel)]="addPop.data.helpMenu" nzPlaceHolder="请输入先选择菜单" nzAllowClear>
+        <nz-option *ngFor="let item of menuOptions" [nzLabel]="item" [nzValue]="item"></nz-option>
+      </nz-select>
+    </section>
+    <ng-template *ngIf="addPop.data.helpMenu">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">标题:</span> 
+        <input required nz-input [(ngModel)]="addPop.data.title" placeholder="" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">内容:</span>
+        <ueditor style="width:500px;" #full [(ngModel)]="addPop.data.content" [config]="{ wordCount: true }" [loadingTip]="'加载中……'" (onReady)="_ready($event)" (onDestroy)="_destroy()"
+        (ngModelChange)="_change($event)"></ueditor>
+      </section>
+      <section class="tpl-list flexa">
+        <nz-upload
+          [nzAction]="api.domain + '/partner-api/system/helpUpLoadImg/' + addPop.data.helpMenu"
+          (nzChange) = 'logoUpImages($event)'
+          >
+          <button nz-button><i nz-icon nzType="upload"></i><span>上传LOGO图片</span></button>
+        </nz-upload>
+      </section>
+    </ng-template>
+  </section>
+</nz-modal> -->
+
+<nz-drawer
+[nzVisible]="addPop.show"
+nzWidth = '70rem'
+nzPlacement="right"
+nzTitle="添加"
+(nzOnClose)="addPop.show = false"
+>
+  <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">菜单:</span> 
+        <nz-select style="width: 300px;" [(ngModel)]="addPop.data.pid" nzPlaceHolder="请输入先选择菜单" nzAllowClear>
+          <nz-option *ngFor="let item of menuOptions" [nzLabel]="item.name" [nzValue]="item.id"></nz-option>
+        </nz-select>
+      </section>
+      <div *ngIf="addPop.data.pid">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">标题:</span> 
+          <input required nz-input style="width: 300px;" [(ngModel)]="addPop.data.title" placeholder="" />
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">内容:</span>
+          <ueditor style="width:500px;" #full [(ngModel)]="addPop.data.content" [config]="{ wordCount: true }" [loadingTip]="'加载中……'" (onReady)="_ready($event)" (onDestroy)="_destroy()"
+          (ngModelChange)="_change($event)"></ueditor>
+        </section>
+        <!-- <section class="tpl-list flexa" *ngIf="addPop.type === 'edit'">
+          <span class="tpl-title">上传图片:</span>
+          <nz-upload
+          class="upload-list-inline"
+          [nzAction]="api.domain + '/partner-api/system/helpUpLoadImg/' + addPop.data.id"
+          [nzRemove]="removeLogo"
+          [nzLimit]="'1'"
+          nzListType="picture-card"
+          [nzFileList]="helpFileList">
+            <i nz-icon nzType="plus"></i>
+            <div class="ant-upload-text">Upload</div>
+          </nz-upload>
+        </section> -->
+      </div>
+      <button nz-button nzType="primary" (click)="sub()"  class="submit">确定</button>
+    </section>
+</nz-drawer>
+
+<!-- <nz-modal
+[(nzVisible)]="contentPop.show"
+[nzCancelText]="null"
+[nzOkText]="null"
+nzTitle="内容提示" 
+(nzOnCancel)="contentPop.show = false">
+  <section class="fw content" [innerHtml]="contentPop.data"></section>
+</nz-modal> -->

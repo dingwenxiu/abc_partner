@@ -1,0 +1,16 @@
+<nz-content style="margin:0 16px;">
+    <section style="padding:12px; min-height: 360px;">
+      <section class="main-content">
+        <div class="menu-list-content">
+          <ng-template ngFor let-data [ngForOf]="childsList" let-i="index">
+            <ul class="menu-list-bg menus-list">
+              <li *ngFor="let item of data; let i2 = index"  [class]="isEdit.includes(item.id)?'menus menus-hover':'menus' ">
+                <span class="menu-label" (click)="openChilds(item, i, item.id, i2)">{{item.cn_name}}({{menuType[item.type]}})</span>
+                <nz-switch [(ngModel)]="item.status" (ngModelChange)="changeMenuStatus(item.id, i, i2)" nzCheckedChildren="启动" nzUnCheckedChildren="禁用" [nzDisabled]="api.loadingSwitch"></nz-switch>
+              </li>
+            </ul>
+          </ng-template>
+        </div>
+      </section>
+    </section>
+</nz-content>

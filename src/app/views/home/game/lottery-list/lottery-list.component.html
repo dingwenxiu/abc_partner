@@ -1,0 +1,214 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <nz-tabset
+        [(nzSelectedIndex)]="selectedIndex"
+      >
+        <nz-tab
+          *ngFor="let tab of seriesList"
+          [nzTitle]="tab.lable"
+          (nzClick)="selectTab(tab.value)"
+        >
+          <nz-table nzShowQuickJumper [nzShowPagination]="false" #tableData [nzData]="tableList">
+            <thead class="ant-table-thead">
+              <tr>
+                <th nzWidth="10%">名称</th>
+                <th nzWidth="7%">标识</th>
+                <th nzWidth="5%">系列</th>
+                <th>图标</th>
+                <th nzWidth="3%">快彩</th>
+                <th>热门</th>
+                <th nzWidth="3%">自开</th>
+                <th nzWidth="3%">水率</th>
+                <th nzWidth="6%">模式</th>
+                <th nzWidth="4%">单价</th>
+                <th nzWidth="5%">最大追号</th>
+                <th nzWidth="5%">每日奖期</th>
+                <th nzWidth="6%">最小奖金组</th>
+                <th nzWidth="6%">最大奖金组</th>
+                <th nzWidth="6%">调整奖金组</th>
+                <th nzWidth="6%">限额</th>
+                <th nzWidth="4%">状态</th>
+                <!-- <th>控水</th> -->
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody class="ant-table-tbody">
+            <tr *ngFor="let item of tableList;let i = index">
+              <td>{{item.cn_name}}</td>
+              <td>{{item.en_name}}</td>
+              <td>{{item.series_id}}</td>
+              <td>
+                <img *ngIf="item.img && item.img !== 'default.jpg'" [src]="api.imgUrl + item.img" style="width: 55px; height: 55px; padding: 3px;" />
+                <span *ngIf="!item.img || item.img === 'default.jpg'">无</span>
+              </td>
+              <td>
+                <ng-container *ngIf="item.is_fast; else elseTemplate">
+                  <i class="fa fa-check" style="color: green;"></i>
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <i class="fa fa-times" style="color: red;"></i>
+                </ng-template>
+              </td>
+              <td>
+                <ng-container *ngIf="item.is_hot; else elseTemplate">
+                  <i class="fa fa-check" style="color: green;"></i>
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <i class="fa fa-times" style="color: red;"></i>
+                </ng-template>
+              </td>
+              <td>
+                <ng-container *ngIf="item.auto_open; else elseTemplate">
+                  <i class="fa fa-check" style="color: green;"></i>
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <i class="fa fa-times" style="color: red;"></i>
+                </ng-template>
+              </td>
+              <td>
+                <span style="color: red;" *ngIf="item.auto_open">{{item.rate}}</span>
+              </td>
+              <td>{{item.valid_modes}}</td>
+              <td>{{item.valid_price}}</td>
+              <td>{{item.max_trace_number}}</td>
+              <td>{{item.day_issue}}</td>
+              <td>{{item.system_min_prize_group}}</td>
+              <td>{{item.system_max_prize_group}}</td>
+              <td>{{item.diff_prize_group}}</td>
+              <td>{{item.max_prize_per_issue}}</td>
+              <td>
+                <!-- <ng-container *ngIf="item.status; else elseTemplate">
+                  <i class="fa fa-check" style="color: green;"></i>
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <i class="fa fa-times" style="color: red;"></i>
+                </ng-template> -->
+                <nz-switch [(ngModel)]="item.status" (ngModelChange)="doLotteryStatus(item, i)" nzCheckedChildren="启用" nzUnCheckedChildren="禁用" class="switch"></nz-switch>
+              </td>
+              <!-- <td>
+                <nz-switch *ngIf="item.auto_open" [(ngModel)]="item.rate_open" (ngModelChange)="rateOpen(item)" nzCheckedChildren="启用" nzUnCheckedChildren="关闭" class="switch"></nz-switch>
+              </td> -->
+              <td>
+                <button nzSize="small" nz-button nzType="primary" (click)="details(item)">编辑</button>
+                <button *ngIf="item.auto_open && issueBetOpen" nzSize="small" nz-button nzType="primary" (click)="setRate(item)">水率</button>
+              </td>
+            </tr>
+            </tbody>
+          </nz-table>
+          <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+        </nz-tab>
+      </nz-tabset>
+    </section>
+  </section>
+  <nz-drawer
+    [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false"
+    [nzWidth]="720"
+    [nzVisible]="edit.show"
+    nzTitle="编辑"
+    (nzOnClose)="edit.show = false"
+  >
+    <nz-layout>
+      <section class="tpl-lists">
+          <section class="tpl-list flexa">
+            <span class="tpl-title">中文名:</span> <input nz-input  [(ngModel)]="edit.data['lottery_name']" placeholder="请输入" class="tpl-input" />
+          </section>
+        <section class="tpl-list flexa">
+            <span class="tpl-title">英文名:</span> <input nz-input  [(ngModel)]="edit.data['lottery_sign']" placeholder="请输入" class="tpl-input" disabled/>
+        </section>
+        <section class="tpl-list flexa" *ngIf="!edit.data.icon_path">
+          <span class="tpl-title">icon:</span> 
+          <nz-upload
+          [nzAction]="api.uploadImg" [nzData] = "{type: 2, test: 0}"
+          (nzChange) = 'upImages($event)'
+          >
+            <button nz-button><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+          </nz-upload>
+        </section>
+        <section class="tpl-list flexa"  *ngIf="edit.data.icon_path">
+          <span class="tpl-title">icon:</span>
+          <section class="img-box">
+            <img style="max-height: 100px;max-width: 100px;" [src]='api.imgUrl + edit.data.icon_path'>
+            <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="deleteImg()"></i>
+          </section>
+        </section>
+        <section class="tpl-list flexa">
+            <span class="tpl-title">最小奖金组:</span> <input nz-input  [(ngModel)]="edit.data['min_prize_group']" placeholder="请输入" class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa">
+            <span class="tpl-title">最大奖金组:</span> <input nz-input  [(ngModel)]="edit.data['max_prize_group']" placeholder="请输入" class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa">
+            <span class="tpl-title">奖金组差值:</span> <input nz-input  [(ngModel)]="edit.data['diff_prize_group']" placeholder="请输入" class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa">
+            <span class="tpl-title">每期最大奖金:</span> <input nz-input  [(ngModel)]="edit.data['max_prize_per_issue']" placeholder="请输入" class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">热门:</span>
+          <nz-radio-group [(ngModel)]="edit.data['is_hot']" [nzButtonStyle]="'solid'">
+            <label nz-radio-button [nzValue]="1">开启</label>
+            <label nz-radio-button [nzValue]="0">关闭</label>
+          </nz-radio-group>
+        </section>
+        <section class="tpl-list flexa">
+            <span class="tpl-title">投注模式:</span>
+            <nz-tree-select
+            id='valid_modes'
+            type="valid_modes"
+            style="width: 250px"
+            [nzNodes]="validModesOption"
+            nzShowSearch
+            nzCheckable
+            [(ngModel)]="edit.data.valid_modes"
+            [nzDefaultExpandAll]="true"
+          >
+          </nz-tree-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">一元/二元模式:</span>
+          <nz-tree-select
+          id='valid_price'
+          type="valid_price"
+          style="width: 250px"
+          [nzNodes]="validPriceOption"
+          nzShowSearch
+          nzCheckable
+          [(ngModel)]="edit.data.valid_price"
+          [nzDefaultExpandAll]="true"
+          >
+          </nz-tree-select>
+        </section>
+      </section>
+      <button nz-button nzType="primary" (click)="submitEdit()" class="submit">
+          提交
+      </button>
+    </nz-layout>
+  </nz-drawer>
+
+  <nz-drawer
+    [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false"
+    [nzWidth]="720"
+    [nzVisible]="rateData.show"
+    nzTitle="水率设置"
+    (nzOnClose)="rateData.show = false"
+  >
+    <nz-layout>
+      <section class="tpl-lists">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">彩种:</span> {{rateData.item.lottery_name}}
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">水率:</span> <input nz-input  [(ngModel)]="rateData.data.rate" placeholder="请输入水率" class="tpl-input"/>
+        </section>
+        <button nz-button nzType="primary" (click)="setRateSubmit()" class="submit">
+          提交
+        </button>
+      </section>
+    </nz-layout>
+  </nz-drawer>
+</nz-content>
+

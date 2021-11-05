@@ -1,0 +1,77 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <nz-layout>
+        <nz-layout>
+          <section class="select-lottery serach-tpl">
+            <section class="tpl-list flexa">
+              <span class="tpl-title">ID:</span>
+              <input nz-input nzSize="small" placeholder="ID" [(ngModel)]="searchData['id']" class="tpl-input" />
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">总代ID:</span>
+              <input nz-input nzSize="small" placeholder="ID" [(ngModel)]="searchData['top_id']" class="tpl-input" />
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">用户ID:</span>
+              <input nz-input nzSize="small" placeholder="用户ID" [(ngModel)]="searchData['user_id']" class="tpl-input" />
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">用户名:</span>
+              <input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData['username']" class="tpl-input" />
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">每页条数:</span>
+              <nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['page_size']" nzAllowClear
+                nzPlaceHolder="每页条数" class="tpl-input">
+                <nz-option [nzValue]="'10'" nzLabel="10条"></nz-option>
+                <nz-option [nzValue]="'20'" nzLabel="20条"></nz-option>
+                <nz-option [nzValue]="'30'" nzLabel="30条"></nz-option>
+              </nz-select>
+            </section>
+            <section class="tpl-list flexa tpl-list-time" style="width: 500px;">
+              <span class="tpl-title">时间:</span>
+              <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)"
+                 (click)="timeHandle()" nzShowTime></nz-range-picker>&nbsp;&nbsp;
+            </section>
+            <section class="tpl-list flexa">
+              <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="search()"><i nz-icon
+                  type="search"></i>搜索</button>&nbsp;&nbsp;
+              <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon
+                  type="sync"></i>重置</button>
+            </section>
+          </section>
+        </nz-layout>
+      </nz-layout>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>ID</th>
+            <th>总代ID</th>
+            <th>用户ID</th>
+            <th>用户名</th>
+            <th>地区</th>
+            <th>登录次数</th>
+            <th>IP</th>
+            <th>访问时间</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.top_id}}</td>
+            <td>{{item.user_id}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.country + '/' + item.city}}</td>
+            <td>{{item.login_count}}</td>
+            <td>{{item.ip}}</td>
+            <td>{{item.created_at}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="page.index" [nzPageSize]="searchData['page_size']" [nzTotal]="page.total"
+        [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>

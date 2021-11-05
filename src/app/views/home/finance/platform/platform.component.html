@@ -1,0 +1,75 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzSize="small" nzType="primary" (click)="addHandler()" nzSize="small">添加厂商</button>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper #nzTable [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+        <tr>
+          <th nzWidth="10%">名字</th>
+          <th nzWidth="10%">标示</th>
+          <th nzWidth="40%">IP白名单</th>
+          <th nzWidth="15%">创建时间</th>
+          <th nzWidth="8%">操作</th>
+        </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+        <ng-template ngFor let-data [ngForOf]="tableList">
+          <tr (click)="lockTd($event)">
+            <td>{{data.platform_name}}</td>
+            <td>{{data.platform_sign}}</td>
+            <td>
+              <section class="text-content" style="max-width:200px;word-break: break-all;margin:0 auto;">
+                  {{data.whitelist_ips}}
+              </section>
+            </td>
+            <td>
+              {{data.created_at}}
+            </td>
+            <td>
+                <a href="javascript:;" class="a-link" (click)="editHandler(data)">编辑</a>
+                <a href="javascript:;" class="a-link" (click)="deleteHandler(data)">删除</a>
+            </td>
+          </tr>
+        </ng-template>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+      (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+
+  <!-- 添加编辑 -->
+  <nz-drawer
+  [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+  [nzMaskClosable]="false"
+  [nzWidth]="720"
+  [nzVisible]="edit.show"
+  nzTitle="编辑/添加"
+  (nzOnClose)="edit.show = false"
+>
+  <section class="tpl-lists">
+    <section class="tpl-list flexa">
+      <span class="tpl-title">厂商名称:</span> <input required nz-input [(ngModel)]="edit.data.platform_name" placeholder="请输入名称" class="tpl-input" />
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">厂商标识:</span> <input nz-input  [(ngModel)]="edit.data.platform_sign" placeholder="请输入厂商标识" class="tpl-input" />
+    </section>
+    <section class="tpl-list flexa">
+          <span class="tpl-title">ip:</span>
+          <input nz-input  [(ngModel)]="edit.data.whitelist_ips" placeholder="请输入厂商标识" class="tpl-input" />
+      </section> 
+    <button nz-button nzType="primary" (click)="submitHandler()" [nzLoading]="edit.loading" class="submit">
+      提交
+    </button>
+  </section>
+</nz-drawer>
+</nz-content>  
+
+<nz-modal [(nzVisible)]="contentPop.show" [nzCancelText]="null" [nzOkText]="null" nzTitle="内容提示"
+  (nzOnCancel)="contentPop.show = false">
+  <section class="fw content">
+    {{contentPop.data}}
+  </section>
+</nz-modal>
+    

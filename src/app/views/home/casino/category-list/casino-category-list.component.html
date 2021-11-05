@@ -1,0 +1,30 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <!-- <section>
+      <button nz-button nzType="primary" (click)="SynchronousData()" [disabled]="timeCoulDown"><i nz-icon type="sync"></i>数据同步</button>
+    </section> -->
+    <section class="main-content">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+        <tr>
+          <th>ID</th>
+          <th>帐号</th>
+          <!-- <th>是否首页显示</th> -->
+        </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+        <tr *ngFor="let item of tableList">
+          <td>{{item.code}}</td>
+          <td>
+            {{item.name}}
+          </td>
+          <!-- <td>
+            <nz-switch [(ngModel)]="item.home" (ngModelChange)="setShow(item.id)" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
+          </td> -->
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>

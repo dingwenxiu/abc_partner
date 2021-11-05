@@ -1,0 +1,419 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzType="primary" (click)="export(1)" nzSize="small">导出当前搜索内容</button> &nbsp;&nbsp;
+    <button nz-button class="top-button" nzType="primary" (click)="export(0)" nzSize="small"><i nz-icon
+        nzType="download"></i>导出当前页</button>
+    <section class="main-content">
+      <section class="select-lottery serach-tpl">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">游戏系列:</span>
+          <nz-cascader nzSize="small" class="tpl-input" [nzOptions]="lotteryOptions" [(ngModel)]="defaultSelect"
+            (ngModelChange)="doSelectLottery($event)" [nzLabelProperty]="'label'"></nz-cascader>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">用户名:</span>
+          <input nzSize="small" class="tpl-input" nz-input placeholder="用户名" [(ngModel)]="searchData['username']" />
+          <label nz-checkbox [(ngModel)]="searchData['username_next']"
+            style="width: 75px;margin-left: -75px;z-index: 999;">
+            下级
+          </label>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">测试状态:</span>
+          <nz-select nzSize="small" class="tpl-input" nzPlaceHolder="是否测试人员" [(ngModel)]="searchData['is_tester']"
+            nzAllowClear>
+            <nz-option nzLabel="全部" nzValue=""></nz-option>
+            <nz-option nzLabel="非测试人员" nzValue="0"></nz-option>
+            <nz-option nzLabel="测试人员" nzValue="1"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">元角模式:</span>
+          <nz-select nzSize="small" class="tpl-input" nzPlaceHolder="元角模式" [(ngModel)]="searchData['mode']"
+            nzAllowClear>
+            <nz-option nzLabel="全部" nzValue=""></nz-option>
+            <nz-option nzLabel="元" nzValue="1"></nz-option>
+            <nz-option nzLabel="角" nzValue="2"></nz-option>
+            <nz-option nzLabel="分" nzValue="3"></nz-option>
+            <nz-option nzLabel="厘" nzValue="4"></nz-option>
+          </nz-select>
+        </section>
+        <!-- <section class="tpl-list flexa">
+          <span class="tpl-title">开奖状态:</span>
+          <nz-select nzSize="small" class="tpl-input" nzPlaceHolder="开奖状态" [(ngModel)]="searchData['status']"
+            nzAllowClear>
+            <nz-option nzLabel="全部" nzValue=""></nz-option>
+            <nz-option nzLabel="待开奖" nzValue="0"></nz-option>
+            <nz-option nzLabel="已撤销" nzValue="1"></nz-option>
+            <nz-option nzLabel="已开奖" nzValue="2"></nz-option>
+            <nz-option nzLabel="已派奖" nzValue="3"></nz-option>
+            <nz-option nzLabel="系统撤销" nzValue="4"></nz-option>
+          </nz-select>
+        </section> -->
+        <section class="tpl-list flexa">
+          <span class="tpl-title">中奖状态:</span>
+          <nz-select nzSize="small" class="tpl-input" nzPlaceHolder="订单状态" [(ngModel)]="searchData['is_win']"
+            nzAllowClear>
+            <nz-option nzLabel="全部" nzValue=""></nz-option>
+            <nz-option nzLabel="待开奖" nzValue="0"></nz-option>
+            <nz-option nzLabel="已派奖" nzValue="1"></nz-option>
+            <nz-option nzLabel="未中奖" nzValue="2"></nz-option>
+            <nz-option nzLabel="和值返款" nzValue="3"></nz-option>
+            <nz-option nzLabel="系统撤销" nzValue="4"></nz-option>
+            <nz-option nzLabel="玩家撤销" nzValue="5"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">IP:</span>
+          <input nz-input placeholder="IP" nzSize="small" [(ngModel)]="searchData['ip']" />
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">每页条数:</span>
+          <nz-select nzSize="small" class="tpl-input" nzPlaceHolder="每页条数" [(ngModel)]="searchData['page_size']"
+            nzAllowClear>
+            <nz-option nzLabel="20条" nzValue="20"></nz-option>
+            <nz-option nzLabel="50条" nzValue="50"></nz-option>
+            <nz-option nzLabel="100条" nzValue="100"></nz-option>
+            <nz-option nzLabel="500条" nzValue="100"></nz-option>
+            <nz-option nzLabel="1000条" nzValue="1000"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">投注模式:</span>
+          <nz-select nzSize="small" class="tpl-input" nzPlaceHolder="投注模式" [(ngModel)]="searchData['price']"
+            nzAllowClear>
+            <nz-option nzLabel="全部" nzValue=""></nz-option>
+            <nz-option nzLabel="1元" nzValue="1"></nz-option>
+            <nz-option nzLabel="2元" nzValue="2"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">注单编号:</span>
+          <input nzSize="small" nz-input class="tpl-input" placeholder="注单编号" [(ngModel)]="searchData['hash_id']" />
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">开奖期号:</span>
+          <input nz-input placeholder="开奖期号" class="tpl-input" nzSize="small" [(ngModel)]="searchData['issue']" />
+        </section>
+        <section class="tpl-list flexa tpl-list-time">
+          <span class="tpl-title">时间:</span>
+          <nz-range-picker [(ngModel)]="dateRange" nzSize="small" (ngModelChange)="onChange($event)" (click)="timeHandle()" nzShowTime>
+          </nz-range-picker>
+        </section>
+        <section class="tpl-list flexa">
+          <button nzSize="small" nz-button nzType="primary" class="select-search" (click)="search()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nzSize="small" nz-button nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>&nbsp;&nbsp;
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="3%">编号</th>
+            <th nzWidth="7%">用户名</th>
+            <th nzWidth="5%">彩种</th>
+            <th nzWidth="5%">玩法</th>
+            <th nzWidth="5%">期号</th>
+            <th style="max-width: 30px;text-overflow:ellipsis;">号码</th>
+            <th nzWidth="3%">注数</th>
+            <th nzWidth="5%">总额</th>
+            <th nzWidth="3%">倍数</th>
+            <th nzWidth="3%">单价</th>
+            <th nzWidth="3%">模式</th>
+            <th nzWidth="4%">奖金组</th>
+            <th nzWidth="4%">单挑</th>
+            <!-- <th nzWidth="3%">中奖</th> -->
+            <th nzWidth="3%">开奖号码</th>
+            <th nzWidth="5%">奖金</th>
+            <th nzWidth="6%">投注时间</th>
+            <th nzWidth="5%">状态</th>
+            <!-- <th nzWidth="5%">中奖</th> -->
+            <th nzWidth="3%">IP</th>
+            <th nzWidth="12%">操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList;let i = index" (click)="lockTd($event)" class="table-tr">
+            <td>
+              <span>
+                {{item.hash_id}}
+              </span>
+            </td>
+            <td [id]="'copy' + i" (click)="copyEx(i)">
+              {{item.username}}<span *ngIf="item.is_tester" style="color: red;">(测)</span>
+            </td>
+            <td>{{item.lottery_name}}</td>
+            <td>{{item.method_name}}</td>
+            <td>
+              <span>
+                {{item.issue}}
+              </span>
+            </td>
+            <td>
+              <p class="text-content">
+                {{item.bet_number_view | keyTrans}}
+              </p>
+            </td>
+            <td>{{item.count}}</td>
+            <td>
+              <span>
+                {{item.total_cost}}
+              </span>
+            </td>
+            <td>{{item.times}}</td>
+            <td>{{item.price}}元</td>
+            <td>{{item.mode}}</td>
+            <td>{{item.bet_prize_group}}</td>
+            <td *ngIf="item.is_challenge == 1" class="cred">是</td>
+            <td *ngIf="item.is_challenge != 1">否</td>
+            <td>
+              <p class="text-content">
+                {{item.open_number | keyTrans}}
+              </p>
+            </td>
+            <td>{{item.bonus}}</td>
+            <td>{{item.time_bought}}</td>
+            <!-- <td>
+              <span *ngIf="item.status == 0" style="color: darkslategrey;">待开奖</span>
+              <span *ngIf="item.status == 1" style="color: #333333;text-decoration:line-through">已撤销</span>
+              <span *ngIf="item.status == 2" style="color: green;">已开奖</span>
+              <span *ngIf="item.status == 3" style="color: red;">已派奖</span>
+              <span *ngIf="item.status == 4" style="color: red;">系统撤销</span>
+            </td> -->
+            <td>
+              <span *ngIf="item.status == 0" style="color: darkslategrey;">待开奖</span>
+              <span *ngIf="item.status == 1" style="color: #333333;text-decoration:line-through">已撤销</span>
+              <span *ngIf="item.status == 4">系统撤销</span>
+              <span *ngIf="item.is_win == 1" style="color: green;">已派奖</span>
+              <span *ngIf="item.is_win == 2" style="color: red">未中奖</span>
+              <span *ngIf="item.is_win == 3">和值返款</span>
+            </td>
+            <td>
+              <span>
+                {{item.ip}}
+              </span>
+            </td>
+            <td id="operating">
+              <a class="a-link" (click)="doDetail(item)">详情</a>&nbsp;
+              <a class="a-link" (click)="doCommissionFn(item)">返点</a>&nbsp;
+              <br />
+              <a class="a-link" (click)="doAccountChange(item)">帐变</a>&nbsp;
+              <a class="a-link" (click)="doCancel(item)">撤单</a>&nbsp;
+            </td>
+          </tr>
+          <tr>
+            <td style="color: green;">本页总计:</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{stat['page_total_cost']}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{stat['page_bonus']}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td style="color: green;">总计:</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{stat['total_total_cost']}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{stat['total_bonus']}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzTotal]="page.total" [(nzPageIndex)]="page.index" [nzPageSize]='searchData.page_size'
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+  <!-- 返点 -->
+  <nz-modal [nzFooter]="null" [nzMaskClosable]='true' nzWidth="960" (nzOnCancel)="doCommissionData.show=false"
+    [(nzVisible)]="doCommissionData.show" nzTitle="返点数据">
+    <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="commissionList">
+      <thead class="ant-table-thead">
+        <tr>
+          <th nzWidth="7%">彩种</th>
+          <th nzWidth="7%">玩法</th>
+          <th nzWidth="7%">类型</th>
+          <th nzWidth="7%">返点对象</th>
+          <th nzWidth="6%">返点金额</th>
+          <th nzWidth="7%">自己奖金组</th>
+          <th nzWidth="7%">下级奖金组</th>
+          <th nzWidth="7%">投注奖金组</th>
+          <th nzWidth="7%">状态</th>
+        </tr>
+      </thead>
+      <tbody class="ant-table-tbody">
+        <tr *ngFor="let item of commissionList">
+          <td>{{item.lottery_name}}</td>
+          <td>{{item.method_name}}</td>
+          <td>
+            <span *ngIf="item.from_type == 'parent'">下级</span>
+            <span *ngIf="item.from_type == 'self'" style="color: green;">个人</span>
+          </td>
+          <td>{{item.user_id}}</td>
+          <td>{{item.amount}}</td>
+          <td>{{item.self_prize_group}}</td>
+          <td>{{item.child_prize_group}}</td>
+          <td>{{item.bet_prize_group}}</td>
+          <td>
+            <span *ngIf="item.status == 1" style="color: green;">已处理</span>
+            <span *ngIf="item.status != 1" style="color: red;">未处理</span>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-modal>
+</nz-content>
+
+
+<nz-modal nzTitle="详情" [nzCancelText]="null" [nzOkText]="null" nzWidth="1000px" [nzVisible]="detailPop.show"
+  (nzOnCancel)="detailPop.show = false">
+  <section class="tpl-lists">
+    <nz-descriptions nzBordered (click)="lockTd($event)">
+      <nz-descriptions-item [nzTitle]="'项目ID'">{{detailPop.data['hash_id']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'彩种名称'">{{detailPop.data['lottery_name']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'玩法名称'">{{detailPop.data['method_name']}}</nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'用户'">{{detailPop.data['username']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'用户奖金组'">{{detailPop.data['user_prize_group']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'投注奖金组'">{{detailPop.data['bet_prize_group']}}</nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'IP'">{{detailPop.data['ip']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'来源'">
+        <span *ngIf="detailPop.data['bet_from'] == '1'" style="color: green;">WEB</span>
+        <span *ngIf="detailPop.data['bet_from'] == '2'" style="color: green;">苹果</span>
+        <span *ngIf="detailPop.data['bet_from'] == '3'" style="color: green;">安卓</span>
+      </nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'是否测试'">
+        <span *ngIf="detailPop.data['is_tester']" style="color: green;">是</span>
+        <span *ngIf="!detailPop.data['is_tester']" style="color: red;">否</span>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'单价'">{{detailPop.data['price']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'倍数'">{{detailPop.data['times']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'模式'">{{detailPop.data['mode']}}</nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'注数'">{{detailPop.data['count']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'花费'">{{detailPop.data['total_cost']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'单挑'">
+        <span *ngIf="detailPop.data['is_challenge']" style="color: green;">是</span>
+        <span *ngIf="!detailPop.data['is_challenge']" style="color: red;">否</span>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'是否中奖'">
+        <span *ngIf="detailPop.data['is_win'] == '1'" style="color: green;">是</span>
+        <span *ngIf="detailPop.data['is_win'] == '2'" style="color: red;">否</span>
+      </nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'中奖注数'">{{detailPop.data['win_count']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'中奖奖金'">{{detailPop.data['bonus']}}</nz-descriptions-item>
+
+      <nz-descriptions-item *ngIf="detailPop.data['status_process'] == '0'" [nzTitle]="'初始化'">
+        {{detailPop.data['status_process']}}</nz-descriptions-item>
+      <nz-descriptions-item *ngIf="detailPop.data['status_process'] == '1'" [nzTitle]="'已经完成'">
+        {{detailPop.data['status_process']}}</nz-descriptions-item>
+      <nz-descriptions-item *ngIf="detailPop.data['status_process'] == '2'" [nzTitle]="'撤单'">
+        {{detailPop.data['status_process']}}</nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'下单时间'">{{detailPop.data['time_bought']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'派奖时间'" *ngIf="detailPop.data['status']">{{detailPop.data['time_send']}}
+      </nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'返点时间'" *ngIf="detailPop.data['status']">{{detailPop.data['time_commission']}}
+      </nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'投注号码'" [nzSpan]="1">
+        <p class="text-content" style="max-width: 650px;">
+          {{detailPop.data['bet_number_view']  | keyTrans}}
+        </p>
+      </nz-descriptions-item>
+    </nz-descriptions>
+  </section>
+</nz-modal>
+
+<nz-drawer nzTitle="帐变" nzWidth="1100px" [nzVisible]="accountChangeData.show"
+  (nzOnClose)="accountChangeData.show = false">
+  <section>
+    <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="accountChangeList">
+      <thead class="ant-table-thead">
+        <tr>
+          <th nzWidth="9%">彩种</th>
+          <th nzWidth="9%">玩法</th>
+          <th nzWidth="7%">奖期</th>
+          <th nzWidth="7%">类型</th>
+          <th nzWidth="6%">金额</th>
+          <th nzWidth="7%">帐变前</th>
+          <th nzWidth="7%">帐变后</th>
+          <th nzWidth="6%">冻结前</th>
+          <th nzWidth="6%">冻结后</th>
+          <th nzWidth="10%">时间</th>
+        </tr>
+      </thead>
+      <tbody class="ant-table-tbody">
+        <tr *ngFor="let item of accountChangeList">
+          <td>{{item.lottery_name}}</td>
+          <td>{{item.method_name}}</td>
+          <td>{{item.issue}}</td>
+          <td>{{item.type_name}}</td>
+          <td>{{item.amount}}</td>
+          <td>{{item.before_balance}}</td>
+          <td>{{item.balance}}</td>
+
+          <td>{{item.before_frozen_balance}}</td>
+          <td>{{item.frozen_balance}}</td>
+          <td>{{item.created_at}}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+    <nz-pagination [nzPageSize]="api.pageSize" [nzPageIndex]="1" [nzTotal]="pageAccountChange.total"
+      [(nzPageIndex)]="pageAccountChange.index" (nzPageIndexChange)="pageAccountChangeChange()" nzShowQuickJumper
+      class="nz-pagination"></nz-pagination>
+  </section>
+</nz-drawer>
+
+<nz-modal [(nzVisible)]="contentPop.show" [nzCancelText]="null" [nzOkText]="null" nzTitle="内容提示"
+  (nzOnCancel)="contentPop.show = false">
+  <section class="fw content">
+    {{contentPop.data}}
+  </section>
+</nz-modal>
+
+<nz-modal [(nzVisible)]="exportPop.show" nzTitle="导出" (nzOnCancel)="exportPop.show = false" [nzOkText]="null"
+  [nzCancelText]="null">
+  <ng-container *ngIf="!exportPop.loading; else elseTemplate">
+    <section class="export-content">
+      <button nz-button nzType="primary" nzSize="large" style="width: 30rem" (click)="exportAllPage()"><i nz-icon
+          nzType="download"></i>Download</button>
+    </section>
+  </ng-container>
+  <ng-template #elseTemplate>
+    <section class="export-content">
+      <button nz-button nzType="primary" nzSize="large" style="width: 30rem" (click)="stopDownload()"><i nz-icon
+          [nzType]="'sync'" [nzSpin]="true"></i>停止下载</button>
+    </section>
+  </ng-template>
+</nz-modal>

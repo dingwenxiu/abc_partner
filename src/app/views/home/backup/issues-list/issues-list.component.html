@@ -1,0 +1,78 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <section class="select-lottery serach-tpl">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">游戏:</span>
+          <nz-cascader nzSize="small" [nzOptions]="lotteryOption" [(ngModel)]="defaultSelect"
+            (ngModelChange)="doSelectLottery($event)" class="tpl-input"></nz-cascader>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">奖期号:</span>
+          <input nz-input nzSize="small" placeholder="奖期号" [(ngModel)]="searchData['issue']"
+            class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa tpl-list-time">
+          <span class="tpl-title tpl-title-search">时间:</span>
+          <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)"
+            (click)="timeHandle()" nzShowTime></nz-range-picker>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="search()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>
+      </section>
+      <nz-table nzShowQuickJumper [nzPageSize]="'999'" [nzShowPagination]="false" #basicTable [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>彩种名称</th>
+            <th>英文名</th>
+            <th>奖期</th>
+            <th>开始时间</th>
+            <th>结束时间</th>
+            <th>开奖号码</th>
+            <th>录号状态</th>
+            <th>开奖状态</th>
+            <th>派奖状态</th>
+            <th>返点状态</th>
+            <th>追号状态</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let data of tableList">
+            <td>{{data.lottery_name}}</td>
+            <td>{{data.lottery_sign}}</td>
+            <td>{{data.issue}}</td>
+            <td>{{data.begin_time}}</td>
+            <td>{{data.end_time}}</td>
+            <td>{{data.official_code}}</td>
+            <td>
+              <span *ngIf="data.status_process >= 1" style="color: green;">是</span>
+              <span *ngIf="data.status_process < 1" style="color: red;">否</span>
+            </td>
+            <td>
+              <span *ngIf="data.status_process >= 2" style="color: green;">是</span>
+              <span *ngIf="data.status_process < 2" style="color: red;">否</span>
+            </td>
+            <td>
+              <span *ngIf="data.status_process == 3" style="color: green;">是</span>
+              <span *ngIf="data.status_process != 3" style="color: red;">否</span>
+            </td>
+            <td>
+              <span *ngIf="data.status_commission == 1" style="color: green;">是</span>
+              <span *ngIf="data.status_commission != 1" style="color: red;">否</span>
+            </td>
+            <td>
+              <span *ngIf="data.status_trace == 1" style="color: green;">是</span>
+              <span *ngIf="data.status_trace != 1" style="color: red;">否</span>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="page.index" [nzPageSize]="searchData['page_size']" [nzTotal]="page.total"
+        [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>

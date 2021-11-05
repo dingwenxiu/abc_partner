@@ -1,0 +1,37 @@
+@import '../../style.css';
+
+.expand{
+  text-align: left !important;
+}
+
+.config-btn {
+  margin: 10px;
+}
+
+.child-table{
+  width: 95%;
+  transform: translateX(3.9%);
+}
+
+tr.ant-table-expanded-row, tr.ant-table-expanded-row:hover{
+  background: none;
+}
+
+::ng-deep .ant-table-bordered .ant-table-body > table{
+  border-top: none;
+}
+::ng-deep .ant-table-placeholder{
+  border-bottom: none; 
+}
+::ng-deep  .ant-table-bordered .ant-table-thead > tr > th, .ant-table-bordered .ant-table-tbody > tr > td {
+  border-right: 1px solid #e8e8e8;
+}
+
+::ng-deep .ant-table-pagination.ant-pagination{
+  margin-right: 50%;
+  transform: translateX(-50%);
+}
+
+.ml {
+  transform: translateX(32px);
+}

@@ -1,0 +1,216 @@
+<nz-layout>
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <nz-content style="margin:0 16px;">
+      <section class="main-content">
+        <section class="select-lottery serach-tpl">
+          <section class="tpl-list flexa">
+            <span class="tpl-title tpl-title-search">游戏系列:</span>
+            <nz-select nzSize="small" nzPlaceHolder="选择系列" [(ngModel)]="defaultSeriesSign" nzAllowClear class="tpl-input" (ngModelChange)='doChangeSeries($event)'>
+                <nz-option *ngFor="let item of lotteryOption |  keyvalue" [nzLabel]="item.value.label" [nzValue]="item.value.value"></nz-option>
+            </nz-select>&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title tpl-title-search">奖期号:</span>
+            <input nz-input nzSize="small" placeholder="奖期号" [(ngModel)]="searchData.issue" class="tpl-input" />&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa tpl-list-time">
+            <span class="tpl-title tpl-title-search">时间:</span>
+            <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)" (click)="timeHandle()" nzShowTime></nz-range-picker>&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa">
+            <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="search()"><i nz-icon type="search"></i>搜索</button>&nbsp;
+            <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="resetSearchData()"><i nz-icon type="sync"></i>重置</button>&nbsp;
+            <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="current()">当前</button>&nbsp;
+            <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="theDay()">当天</button>
+          </section>
+        </section>
+        <nz-tabset [(nzSelectedIndex)]="tabIndex">
+          <nz-tab  [nzTitle]="_tab.value" *ngFor="let _tab of lotteryTabOption | keyvalue; let i = index" (nzSelect)="doTabChange(_tab.key)">
+          </nz-tab>
+        </nz-tabset>
+      </section>
+      <nz-table
+      nzShowQuickJumper
+      [nzPageSize]='api.pageSize'
+      [nzShowPagination]="false"
+      #basicTable
+      [nzData]="tableList">
+          <thead class="ant-table-thead">
+            <tr>
+              <th>彩种名称</th>
+              <th>英文名</th>
+              <th>奖期</th>
+              <th>开始时间</th>
+              <th>结束时间</th>
+              <th>开奖号码</th>
+              <th>录号状态</th>
+              <th>开奖状态</th>
+              <th>派奖状态</th>
+              <th>返点状态</th>
+              <th>追号状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody  class="ant-table-tbody">
+            <tr *ngFor="let data of tableList">
+              <td>{{data.lottery_name}}</td>
+              <td>{{data.lottery_sign}}</td>
+              <td>{{data.issue}}</td>
+              <td>{{data.begin_time}}</td>
+              <td>{{data.end_time}}</td>
+              <td>{{data.official_code}}</td>
+              <td>
+                <span *ngIf="data.status_process >= 1" style="color: green;">是</span>
+                <span *ngIf="data.status_process < 1" style="color: red;">否</span>
+              </td>
+              <td>
+                <span *ngIf="data.status_process >= 2" style="color: green;">是</span>
+                <span *ngIf="data.status_process < 2" style="color: red;">否</span>
+              </td>
+              <td>
+                <span *ngIf="data.status_process == 3" style="color: green;">是</span>
+                <span *ngIf="data.status_process != 3" style="color: red;">否</span>
+              </td>
+              <td>
+                <span *ngIf="data.status_commission == 1" style="color: green;">是</span>
+                <span *ngIf="data.status_commission != 1" style="color: red;">否</span>
+              </td>
+              <td>
+                <span *ngIf="data.status_trace == 1" style="color: green;">是</span>
+                <span *ngIf="data.status_trace != 1" style="color: red;">否</span>
+              </td>
+              <td>
+                <button nzSize="small" nz-button nzType="primary" (click)="doDetail(data)">详情</button>&nbsp;
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+        <nz-pagination [nzPageSize]='api.pageSize' [nzTotal]="total" [(nzPageIndex)]="searchData.page_index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+        </nz-pagination>
+    </nz-content>
+    </section>
+
+  <nz-drawer
+    nzTitle = "详情"
+    nzWidth = "1000px"
+    [nzVisible] = "detail.show"
+    (nzOnClose) = "detail.show = false"
+  >
+    <section class="tpl-lists">
+      <nz-descriptions nzBordered>
+        <nz-descriptions-item  [nzTitle]="'彩种名称'">{{detail.data.lottery_name}}</nz-descriptions-item>
+        <nz-descriptions-item  [nzTitle]="'奖期'">{{detail.data.issue}}</nz-descriptions-item>
+        <nz-descriptions-item  [nzTitle]="'开奖号码'">{{detail.data.official_code}}</nz-descriptions-item>
+
+        <nz-descriptions-item  [nzTitle]="'开时时间'">{{detail.data.begin_time}}</nz-descriptions-item>
+        <nz-descriptions-item  [nzTitle]="'结束时间'">{{detail.data.end_time}}</nz-descriptions-item>
+        <nz-descriptions-item  [nzTitle]="'录号时间'">{{detail.data.encode_time}}</nz-descriptions-item>
+
+        <nz-descriptions-item  [nzTitle]="'开奖开始时间'">{{detail.data.time_open}}</nz-descriptions-item>
+        <nz-descriptions-item  [nzTitle]="'开奖结束时间'">{{detail.data.time_end_open}}</nz-descriptions-item>
+        <nz-descriptions-item  [nzTitle]="'开奖状态'">
+          <span *ngIf="detail.data.status_process >= '2'" style="color: green;">是</span>
+          <span *ngIf="detail.data.status_process < '2'" style="color: red;">否</span>
+        </nz-descriptions-item>
+
+        <nz-descriptions-item  [nzTitle]="'派奖开始时间'">{{detail.data.time_send}}</nz-descriptions-item>
+        <nz-descriptions-item  [nzTitle]="'派奖结束时间'">{{detail.data.time_end_send}}</nz-descriptions-item>
+        <nz-descriptions-item  [nzTitle]="'派奖状态'">
+          <span *ngIf="detail.data.status_process >= '3'" style="color: green;">是</span>
+          <span *ngIf="detail.data.status_process < '3'" style="color: red;">否</span>
+        </nz-descriptions-item>
+
+        <nz-descriptions-item  [nzTitle]="'追号开始时间'">{{detail.data.time_trace}}</nz-descriptions-item>
+        <nz-descriptions-item  [nzTitle]="'追号结束时间'">{{detail.data.time_end_trace}}</nz-descriptions-item>
+        <nz-descriptions-item  [nzTitle]="'追号状态'">
+          <span *ngIf="detail.data.status_trace == '1'" style="color: green;">是</span>
+          <span *ngIf="detail.data.status_trace != '1'" style="color: red;">否</span>
+        </nz-descriptions-item>
+
+        <nz-descriptions-item  [nzTitle]="'返点开始时间'">{{detail.data.time_commission}}</nz-descriptions-item>
+        <nz-descriptions-item  [nzTitle]="'返点结束时间'">{{detail.data.time_end_commission}}</nz-descriptions-item>
+        <nz-descriptions-item  [nzTitle]="'返点状态'">
+          <span *ngIf="detail.data.status_commission == '1'" style="color: green;">是</span>
+          <span *ngIf="detail.data.status_commission != '1'" style="color: red;">否</span>
+        </nz-descriptions-item>
+      </nz-descriptions>
+    </section>
+  </nz-drawer>
+
+  <nz-drawer
+    nzTitle = "录号"
+    nzWidth = "1000px"
+    [nzVisible] = "encodeData.show"
+    (nzOnClose) = "encodeData.show = false"
+  >
+    <nz-table #encodeTable [nzData]="[1]" [nzNoResult]=""  [nzShowPagination]="false">
+      <thead>
+      <tbody>
+      <tr >
+        <td [nzAlign]="'right'" style="color: green;">时时彩,排列三五</td>
+        <td [nzAlign]="'left'" style="padding-left: 15px;">0,1,2,3,4,5,6,7,8,9 十个数字中选5个,逗号隔开,号码可以重复, 例如：1,3,5,7,8</td>
+      </tr>
+      <tr >
+        <td [nzAlign]="'right'" style="color: green;">三D,时时乐,PC蛋蛋</td>
+        <td [nzAlign]="'left'" style="padding-left: 15px;">0,1,2,3,4,5,6,7,8,9 十个数字中选3个,逗号隔开,号码可以重复, 例如：1,7,8</td>
+      </tr>
+      <tr >
+        <td [nzAlign]="'right'" style="color: green;">快三</td>
+        <td [nzAlign]="'left'" style="padding-left: 15px;">1,2,3,4,5,6 个数字中选3个,逗号隔开,号码可以重复, 例如：2,4,6</td>
+      </tr>
+      <tr >
+        <td [nzAlign]="'right'" style="color: green;">PK10</td>
+        <td [nzAlign]="'left'" style="padding-left: 15px;">01,02,03,04,05,06,07,08,09,10  10个数字中选10个,逗号隔开,号码<span style="color: red; font-size: larger;">不可以重复</span>, 例如：09,02,03,04,05,06,07,08,01,10</td>
+      </tr>
+      <tr >
+        <td [nzAlign]="'right'" style="color: green;">六合彩</td>
+        <td [nzAlign]="'left'" style="padding-left: 15px;">01,02,03,04,05, --- 49 一共 49个数字中选7个,逗号隔开,号码<span style="color: red; font-size: larger;">不可以重复</span>, 例如：01,03,21,34,20,33,20</td>
+      </tr>
+      </tbody>
+    </nz-table>
+
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">目标彩种:</span>
+        <span style='color:red;'>{{encodeData.lottery_name}}</span>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">目标奖期:</span>
+        <span style='color:red;'>{{encodeData.issue}}</span>
+      </section>
+      <section class="tpl-list flexa ">
+        <span class="tpl-title">录入号码:</span>
+        <input nz-input placeholder="请录入号码" [(ngModel)]="encodeData.data.code" class="tpl-input tpl-list-lr"/>
+      </section>
+      <section class="tpl-list flexa">
+          <span class="tpl-title">资金密码:</span>
+          <input nz-input placeholder="请输入资金密码" [(ngModel)]="encodeData.data.fund_password" class="tpl-input"/>
+      </section>
+      <button nz-button nzType="primary" (click)="doEncodeSubmit()"  class="submit">
+          提交
+      </button>
+  </section>
+
+  </nz-drawer>
+
+  <nz-modal [(nzVisible)]="issueCancelData.show" [nzCancelText]="null" [nzOkText]="null" nzTitle="撤单提示"
+            (nzOnCancel)="issueCancelData.show = false">
+    <section class="tpl-list flexa">
+      <span class="tpl-title">目标彩种:</span>
+      <span style='color:red;'>{{issueCancelData.lottery_name}}</span>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">目标奖期:</span>
+      <span style='color:red;'>{{issueCancelData.issue}}</span>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">资金密码:</span>
+      <input nz-input placeholder="请输入资金密码" [(ngModel)]="issueCancelData.data.fund_password" class="tpl-input"/>
+    </section>
+    <section class="tpl-list flexa">
+      <button nz-button nzType="primary" (click)="doCancelSubmit()"  class="submit">
+        提交
+      </button>
+    </section>
+  </nz-modal>
+</nz-layout>

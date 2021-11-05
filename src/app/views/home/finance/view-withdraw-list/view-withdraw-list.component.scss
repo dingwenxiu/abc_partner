@@ -1,0 +1,88 @@
+@import '../../style.css';
+
+.share{
+  padding:10px 0;
+}
+.qr-code{
+  margin:0 auto;
+  width:130px;
+  height:130px;
+}
+.fasts{
+  font-family: cursive;
+  line-height: 30px;
+  font-size: 15px;
+  padding-left: 20px;
+  list-style: disc;
+  color: #333;
+}
+.fasts .a-link{
+  vertical-align:unset ;
+}
+
+
+.select-lottery{
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.tpl-title-search{
+  width: 75px;
+}
+
+.tpl-list{
+  width: 290px;
+}
+
+
+.tpl-input{
+  width: 200px;
+}
+.tpl-list{
+  width: auto;
+}
+.tpl-list-time{
+  width: 470px;
+}
+.tpl-lists-handPop{
+  padding:0;
+}
+.ant-btn-primary{
+  margin:2px 0 ;
+}
+.tpl-lists{
+  padding:0;
+}
+::ng-deep .ant-calendar-picker{
+  width: 210px;
+}
+
+.refresh{
+  width: 190px;
+  float: right;
+}
+
+.newData{
+  animation: new 2s infinite;
+}
+
+@keyframes new{
+  0%{
+    background-color: rgba($color: #def1ff, $alpha: 0);
+  }
+  50%{
+    background-color: rgba($color: #def1ff, $alpha: 1);
+  }
+  100%{
+    background-color: rgba($color: #def1ff, $alpha: 0);
+  }
+}
+
+.userMark{
+  background-color: red;
+  color: white;
+  padding: 5px 0;
+  text-align: center;
+  font-size: 3rem;
+}
+

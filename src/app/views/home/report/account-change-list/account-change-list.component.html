@@ -1,0 +1,281 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzType="primary" (click)="export(1)" nzSize="small">导出当前搜索内容</button> &nbsp;&nbsp;
+    <button nz-button class="top-button" nzType="primary" (click)="export(0)" nzSize="small"><i nz-icon
+        nzType="download"></i>导出当前页</button>
+    <section class="main-content">
+      <nz-layout>
+        <nz-sider>
+          <section class="tpl-list flexa">
+            <span class="tpl-title">类型:</span>
+            <select size="5" [(ngModel)]="type" (ngModelChange)="typeChange($event)" multiple>
+              <option value="">全部</option>
+              <option *ngFor="let item of typeOption | keyvalue" [value]="item.key">{{item.value}}</option>
+            </select>
+          </section>
+        </nz-sider>
+        <nz-layout>
+          <section class="select-lottery serach-tpl">
+            <section class="tpl-list flexa">
+              <span class="tpl-title">账变ID:</span>
+              <input nz-input nzSize="small" placeholder="账变ID" [(ngModel)]="searchData['hash_id']" class="tpl-input" />
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">是否测试:</span>
+              <nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['is_tester']" nzAllowClear
+                nzPlaceHolder="类型" class="tpl-input">
+                <nz-option nzValue="" nzLabel="全部"></nz-option>
+                <nz-option nzValue="1" nzLabel="测试用户"></nz-option>
+                <nz-option nzValue="0" nzLabel="非测试用户"></nz-option>
+              </nz-select>
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">管理员ID:</span>
+              <nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['from_admin_id']" nzAllowClear
+                nzPlaceHolder="管理员ID" class="tpl-input">
+                <nz-option nzValue="" nzLabel="全部"></nz-option>
+                <nz-option *ngFor="let item of adminList" [nzValue]="item.id" [nzLabel]="item.username">
+                </nz-option>
+              </nz-select>
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title tpl-title-search">帐变金额:</span>
+              <nz-input-group nzCompact class="tpl-input" nzSize="small">
+                <input type="text" nz-input [(ngModel)]="searchData['amount_min']" style="width:92px;"
+                  placeHolder="余额最小" nzSize="small" />-
+                <input type="text" nz-input [(ngModel)]="searchData['amount_max']" style="width:92px;"
+                  placeHolder="余额最大" nzSize="small" />
+              </nz-input-group>
+            </section>
+            <section class="tpl-list flexa tpl-list-time" style="width: 640px;">
+              <section class="tpl-list flexa">
+                <span class="tpl-title">用户搜索:</span>
+                <nz-select nzSize="small" [(ngModel)]="userSearch" (ngModelChange)="userType($event)" nzAllowClear nzPlaceHolder="请选择" class="tpl-input">
+                  <nz-option [nzValue]="'1'" nzLabel="总代理"></nz-option>
+                  <nz-option [nzValue]="" nzLabel="手动输入"></nz-option>
+                </nz-select>
+              </section>
+              <section class="tpl-list flexa" *ngIf="!userSearch">
+                <span class="tpl-title">用户名:</span>
+                <input style="width: 115px;" nz-input nzSize="small" placeholder="用户名"
+                  [(ngModel)]="searchData['username']" class="tpl-input" />
+              </section>
+              <section class="tpl-list flexa" *ngIf="userSearch">
+                <span class="tpl-title">总代理:</span>
+                <nz-select style="width: 115px;" nzSize="small" [(ngModel)]="userId" nzAllowClear
+                  nzPlaceHolder="总代理" class="tpl-input">
+                  <nz-option nzValue="" nzLabel="全部"></nz-option>
+                  <nz-option *ngFor="let item of agentList" [nzValue]="item.user_id" [nzLabel]="item.username">
+                  </nz-option>
+                </nz-select>
+                <label nz-checkbox nzSize="small" [(ngModel)]="topAgent" class="tempChexk">不计总代</label>
+                <label nz-checkbox nzSize="small" [(ngModel)]="agentTop" class="tempChexk">含下级</label>
+              </section>
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">游戏账变:</span>
+              <nz-cascader nzSize="small" [nzOptions]="lotteryOption" [(ngModel)]="defaultSelect"
+                (ngModelChange)="doSelectLottery($event)" class="tpl-input"></nz-cascader>&nbsp;&nbsp;
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">金额模式:</span>
+              <nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['mode']" nzAllowClear
+                nzPlaceHolder="金额模式" class="tpl-input">
+                <nz-option nzValue="" nzLabel="全选"></nz-option>
+                <nz-option nzValue="1" nzLabel="元"></nz-option>
+                <nz-option nzValue="2" nzLabel="角"></nz-option>
+                <nz-option nzValue="3" nzLabel="分"></nz-option>
+              </nz-select>
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">每页条数:</span>
+              <nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['page_size']" nzAllowClear
+                nzPlaceHolder="每页条数" class="tpl-input">
+                <nz-option [nzValue]="'10'" nzLabel="10条"></nz-option>
+                <nz-option [nzValue]="'20'" nzLabel="20条"></nz-option>
+                <nz-option [nzValue]="'40'" nzLabel="40条"></nz-option>
+                <nz-option [nzValue]="'60'" nzLabel="60条"></nz-option>
+                <nz-option [nzValue]="'80'" nzLabel="80条"></nz-option>
+              </nz-select>
+            </section>
+            <section class="tpl-list flexa tpl-list-time" style="width: 500px;">
+              <span class="tpl-title">时间:</span>
+              <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)"
+                (nzOnCalendarChange)="onCelen($event)" (click)="timeHandle()" nzShowTime></nz-range-picker>&nbsp;&nbsp;
+            </section>
+            <section class="tpl-list flexa">
+              <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="search()"><i nz-icon
+                  type="search"></i>搜索</button>&nbsp;&nbsp;
+              <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon
+                  type="sync"></i>重置</button>
+            </section>
+          </section>
+        </nz-layout>
+      </nz-layout>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">账变ID</th>
+            <th nzWidth="9%">创建时间</th>
+            <th>用户名</th>
+            <th>总代ID</th>
+            <th>测试用户</th>
+            <th>描述</th>
+            <th nzWidth="8%">游戏</th>
+            <th>投注方式</th>
+            <th>金额模式</th>
+            <th>金额</th>
+            <th>用户余额</th>
+            <th>备注</th>
+            <th>管理员ID</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.hash_id}}</td>
+            <td>{{item.created_at}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.top_id}}</td>
+            <td>{{item.is_tester === 1 ? '是' : '否'}}</td>
+            <td>{{item.type_name}}</td>
+            <td>{{item.lottery_name}}</td>
+            <td>{{item.method_name}}</td>
+            <td>
+              <span *ngIf="item.mode == ''">无</span>
+              <span *ngIf="item.mode == 1">元</span>
+              <span *ngIf="item.mode == 2">角</span>
+              <span *ngIf="item.mode == 3">分</span>
+            </td>
+            <td>
+              <span *ngIf="item.type_flow === '增加'" style="color:green">+{{item.amount}}</span>
+              <span *ngIf="item.type_flow === '减少'" style="color:red">-{{item.amount}}</span>
+            </td>
+            <td>{{item.balance}}</td>
+            <td>{{item.desc}}</td>
+            <td>{{item.from_admin_id}}</td>
+            <td>
+              <a href="javascript:;" class="a-link" (click)="doShowCommissionDetail(item.hash_id)">帐变明细</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="color: green;">本页统计:</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{totalStat['pageAmount']}}</td>
+            <td></td>
+            <td colspan="3"></td>
+          </tr>
+          <tr>
+            <td style="color: green;">总计:</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{totalStat['totalAmount']}}</td>
+            <td></td>
+            <td colspan="3"></td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="page.index" [nzPageSize]="searchData['page_size']" [nzTotal]="page.total"
+        [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+
+
+</nz-content>
+
+<nz-modal nzTitle="订单详情" [nzCancelText]="null" [nzOkText]="null" nzWidth="1000px" [nzVisible]="projectData.show"
+  (nzOnCancel)="projectData.show = false">
+  <section class="tpl-lists">
+    <nz-descriptions nzBordered>
+      <nz-descriptions-item [nzTitle]="'项目ID'">{{projectData.data['hash_id']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'彩种名称'">{{projectData.data['lottery_name']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'玩法名称'">{{projectData.data['method_name']}}</nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'用户'">{{projectData.data['username']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'用户奖金组'">{{projectData.data['user_prize_group']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'投注奖金组'">{{projectData.data['bet_prize_group']}}</nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'IP'">{{projectData.data['ip']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'来源'">
+        <span *ngIf="projectData.data['bet_from'] == '1'" style="color: green;">WEB</span>
+        <span *ngIf="projectData.data['bet_from'] == '2'" style="color: green;">苹果</span>
+        <span *ngIf="projectData.data['bet_from'] == '3'" style="color: green;">安卓</span>
+      </nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'是否测试'">
+        <span *ngIf="projectData.data['is_tester']" style="color: green;">是</span>
+        <span *ngIf="!projectData.data['is_tester']" style="color: red;">否</span>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'单价'">{{projectData.data['price']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'倍数'">{{projectData.data['times']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'模式'">{{projectData.data['mode']}}</nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'注数'">{{projectData.data['count']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'花费'">{{projectData.data['total_cost']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'单挑'">
+        <span *ngIf="projectData.data['is_challenge']" style="color: green;">是</span>
+        <span *ngIf="!projectData.data['is_challenge']" style="color: red;">否</span>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'是否中奖'">
+        <span *ngIf="projectData.data['is_win'] == '1'" style="color: green;">是</span>
+        <span *ngIf="projectData.data['is_win'] == '2'" style="color: red;">否</span>
+      </nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'中奖注数'">{{projectData.data['win_count']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'中奖奖金'">{{projectData.data['bonus']}}</nz-descriptions-item>
+
+      <nz-descriptions-item *ngIf="projectData.data['status_process'] == '0'" [nzTitle]="'初始化'">
+        {{projectData.data['status_process']}}</nz-descriptions-item>
+      <nz-descriptions-item *ngIf="projectData.data['status_process'] == '1'" [nzTitle]="'已经完成'">
+        {{projectData.data['status_process']}}</nz-descriptions-item>
+      <nz-descriptions-item *ngIf="projectData.data['status_process'] == '2'" [nzTitle]="'撤单'">
+        {{projectData.data['status_process']}}</nz-descriptions-item>
+
+      <nz-descriptions-item [nzTitle]="'下单时间'">{{projectData.data['time_bought']}}</nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'派奖时间'" *ngIf="projectData.data['status']">{{projectData.data['time_send']}}
+      </nz-descriptions-item>
+      <nz-descriptions-item [nzTitle]="'返点时间'" *ngIf="projectData.data['status']">
+        {{projectData.data['time_commission']}}
+      </nz-descriptions-item>
+
+
+      <nz-descriptions-item [nzTitle]="'投注号码'">{{projectData.data['bet_number_view']}}</nz-descriptions-item>
+    </nz-descriptions>
+  </section>
+</nz-modal>
+<nz-modal nzTitle="账变详情" [nzCancelText]="null" [nzOkText]="null" nzWidth="1200px" [nzVisible]="commissionData.show"
+  (nzOnCancel)="commissionData.show = false">
+  <nz-descriptions nzBordered>
+    <nz-descriptions-item *ngFor="let item of commissionData.data | keyValueDel:'account_change'" [nzTitle]="item[0]">{{item[1]}}
+    </nz-descriptions-item>
+  </nz-descriptions>
+</nz-modal>
+<nz-modal [(nzVisible)]="exportPop.show" nzTitle="导出" (nzOnCancel)="exportPop.show = false" [nzOkText]="null"
+  [nzCancelText]="null">
+  <ng-container *ngIf="!exportPop.loading; else elseTemplate">
+    <section class="export-content">
+      <button nz-button nzType="primary" nzSize="large" style="width: 30rem" (click)="exportAllPage()"><i nz-icon
+          nzType="download"></i>Download</button>
+    </section>
+  </ng-container>
+  <ng-template #elseTemplate>
+    <section class="export-content">
+      <button nz-button nzType="primary" nzSize="large" style="width: 30rem" (click)="stopDownload()"><i nz-icon
+          [nzType]="'sync'" [nzSpin]="true"></i>停止下载</button>
+    </section>
+  </ng-template>
+</nz-modal>

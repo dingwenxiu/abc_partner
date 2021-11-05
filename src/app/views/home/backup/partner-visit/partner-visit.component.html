@@ -1,0 +1,91 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <nz-layout>
+        <nz-layout>
+          <section class="select-lottery serach-tpl">
+            <section class="tpl-list flexa">
+              <span class="tpl-title">管理用户:</span>
+              <nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['partner_admin_id']" nzAllowClear
+                nzPlaceHolder="管理用户" class="tpl-input">
+                <nz-option [nzValue]="''" nzLabel="全部"></nz-option>
+                <nz-option *ngFor="let item of adminUserList | objkeys" [nzValue]="item"
+                  [nzLabel]="adminUserList[item]"></nz-option>
+              </nz-select>
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">路由:</span>
+              <input nz-input nzSize="small" placeholder="路由" [(ngModel)]="searchData['route']" class="tpl-input" />
+            </section>
+            <!-- <section class="tpl-list flexa">
+              <span class="tpl-title">每页条数:</span>
+              <nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['page_size']" nzAllowClear
+                nzPlaceHolder="每页条数" class="tpl-input">
+                <nz-option [nzValue]="'10'" nzLabel="10条"></nz-option>
+                <nz-option [nzValue]="'20'" nzLabel="20条"></nz-option>
+                <nz-option [nzValue]="'30'" nzLabel="30条"></nz-option>
+              </nz-select>
+            </section> -->
+            <section class="tpl-list flexa tpl-list-time" style="width: 500px;">
+              <span class="tpl-title">时间:</span>
+              <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)" (click)="timeHandle()" nzShowTime></nz-range-picker>&nbsp;&nbsp;
+            </section>
+            <section class="tpl-list flexa">
+              <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="search()"><i nz-icon
+                  type="search"></i>搜索</button>&nbsp;&nbsp;
+              <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon
+                  type="sync"></i>重置</button>
+            </section>
+          </section>
+        </nz-layout>
+      </nz-layout>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>ID</th>
+            <th>商户名</th>
+            <th>浏览器</th>
+            <th>路由</th>
+            <th>代理</th>
+            <th>平台</th>
+            <th>地区</th>
+            <th>设备</th>
+            <th>代理IP</th>
+            <th>IP</th>
+            <th>访问时间</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList" (click)="lockTd($event)">
+            <td>{{item.id}}</td>
+            <td>{{item.partner_admin_username}}</td>
+            <td>
+              <p class="text-content">
+                {{item.browser}}
+              </p>
+            </td>
+            <td>{{item.route}}</td>
+            <td>
+              <p class="text-content">
+                {{item.agent}}
+              </p>
+            </td>
+            <td>{{item.platform}}</td>
+            <td>{{item.country + '/' + item.city}}</td>
+            <td>{{item.device}}</td>
+            <td>{{item.proxy_ip}}</td>
+            <td>{{item.ip}}</td>
+            <td>{{item.created_at}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="page.index" [nzPageSize]="searchData['page_size']" [nzTotal]="page.total"
+        [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+
+  <nz-modal [(nzVisible)]="contentPop.show" [nzCancelText]="null" [nzOkText]="null" nzTitle="内容提示"
+    (nzOnCancel)="contentPop.show = false">
+    <section class="fw content" [innerHtml]="contentPop.data"></section>
+  </nz-modal>

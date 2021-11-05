@@ -1,0 +1,224 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <!-- <button nz-button class="top-button" nzSize="small" nzType="primary" (click)="addHandler()" nzSize="small">添加账户</button> -->
+    <section class="main-content">
+      <section class="select-lottery serach-tpl">
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">状态:</span>
+          <nz-select [(ngModel)]="searchData['status']" nzAllowClear nzPlaceHolder="请选择状态" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option nzValue="1" nzLabel="启用"></nz-option>
+            <nz-option nzValue="0" nzLabel="停用"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">手续费类型:</span>
+          <nz-select [(ngModel)]="searchData['fee_type']" nzAllowClear nzPlaceHolder="手续费类型" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="0" nzLabel="全部"></nz-option>
+            <nz-option nzValue="1" nzLabel="额定"></nz-option>
+            <nz-option nzValue="2" nzLabel="比例"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">手续费来源:</span>
+          <nz-select [(ngModel)]="searchData['fee_from']" nzAllowClear nzPlaceHolder="手续费来源" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="0" nzLabel="全部"></nz-option>
+            <nz-option nzValue="1" nzLabel="平台"></nz-option>
+            <nz-option nzValue="2" nzLabel="玩家"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">支付平台:</span>
+          <nz-select [(ngModel)]="searchData['platform_sign']" nzAllowClear nzPlaceHolder="请选择平台" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option *ngFor="let item of platformOption" [nzValue]="item.platform_sign" [nzLabel]="item.platform_name"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">设备:</span>
+          <nz-select [(ngModel)]="searchData['device']" nzAllowClear nzPlaceHolder="请选择状态" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="0" nzLabel="全部"></nz-option>
+            <nz-option nzValue="1" nzLabel="电脑端"></nz-option>
+            <nz-option nzValue="2" nzLabel="手机端"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <button nz-button nzType="primary" class="select-search" (click)="serach()" nzSize="small"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" class="select-reset" (click)="resetSearch()" nzSize="small"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>
+      </section>
+      <nz-table nzShowQuickJumper #nzTable [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>支付平台</th>
+            <th>账户ID</th>
+            <th>频道</th>
+            <th>前台显示</th>
+            <th>前台备注</th>
+            <th>后台显示</th>
+            <th>后台备注</th>
+
+            <th>设备</th>
+
+
+            <th>手续费类型</th>
+            <th>手续费来源</th>
+            <th>手续费</th>
+
+            <th>返利</th>
+
+            <th>最大金额</th>
+            <th>最小金额</th>
+            <th>排序</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-data [ngForOf]="tableList">
+            <tr>
+              <td>{{data['platform_name']}}</td>
+              <td>{{data['account_id']}}</td>
+              <td>{{data['channel_name']}}</td>
+              <td>{{data['back_name']}}</td>
+              <td>{{data['back_remark']}}</td>
+              <td>{{data['front_name']}}</td>
+              <td>{{data['front_remark']}}</td>
+              <td>{{data['device'] === 0 ? '全部' : data['device'] === 1 ? '电脑端' : '手机端'}}</td>
+              <td>
+                <span *ngIf="data['fee_type'] == 1">定额</span>
+                <span *ngIf="data['fee_type'] == 2">比列</span>
+              </td>
+              <td>
+                <span *ngIf="data['fee_from'] == 1">平台</span>
+                <span *ngIf="data['fee_from'] == 2">玩家</span>
+              </td>
+              <td>{{data['fee_amount']}}</td>
+
+              <td>{{data['fee_return']}}</td>
+
+
+              <td>{{data['max']}}</td>
+              <td>{{data['min']}}</td>
+
+              <td>{{data['sort']}}</td>
+              <td>
+                <nz-switch [ngModel]="data['status']" nzCheckedChildren="启用" nzUnCheckedChildren="停用"
+                  (ngModelChange)="changeStatus(data.id)"></nz-switch>
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+
+  <!-- 添加编辑 -->
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="720" [nzVisible]="edit.show" nzTitle="编辑/添加" (nzOnClose)="edit.show = false">
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">支付厂商:</span>
+        <nz-select style="width: 173px;" [(ngModel)]="edit.data['platform_sign']" (ngModelChange)="getOptions($event)"
+          nzAllowClear>
+          <nz-option *ngFor="let option of platformOption" [nzValue]="option.platform_sign"
+            [nzLabel]="option.platform_name">
+          </nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">支付类型:</span>
+        <nz-select style="width: 173px;" [(ngModel)]="edit.data['type_sign']" nzAllowClear>
+          <nz-option *ngFor="let option of ChannelTypeOptions" [nzValue]="option.type_sign"
+            [nzLabel]="option.type_name">
+          </nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">用户等级:</span>
+        <section>
+          <nz-checkbox-group [(ngModel)]="levels"></nz-checkbox-group>
+        </section>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">渠道ID:</span> <input nz-input [(ngModel)]="edit.data['platform_channel_id']"
+          placeholder="请输入" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">前台:</span> <input nz-input [(ngModel)]="edit.data['front_name']" placeholder="请输入"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">前台备注:</span> <input nz-input [(ngModel)]="edit.data['front_remark']" placeholder="请输入"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">后台名称:</span> <input nz-input [(ngModel)]="edit.data['back_name']" placeholder="请输入"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">后台备注:</span> <input nz-input [(ngModel)]="edit.data['back_remark']" placeholder="请输入"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">手续费类型:</span>
+        <nz-radio-group [(ngModel)]="edit.data['fee_type']" [nzButtonStyle]="'solid'">
+          <label nz-radio-button nzValue="1">定额</label>
+          <label nz-radio-button nzValue="2">比列</label>
+        </nz-radio-group>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">手续费来源:</span>
+        <nz-radio-group [(ngModel)]="edit.data['fee_from']" [nzButtonStyle]="'solid'">
+          <label nz-radio-button nzValue="1">平台</label>
+          <label nz-radio-button nzValue="2">玩家</label>
+        </nz-radio-group>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">手续费:</span> <input nz-input [(ngModel)]="edit.data['fee_amount']" placeholder="请输入"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">返利:</span> <input nz-input [(ngModel)]="edit.data['fee_return']" placeholder="请输入"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">最大金额:</span> <input nz-input [(ngModel)]="edit.data['max']" placeholder="请输入"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">最小金额:</span> <input nz-input [(ngModel)]="edit.data['min']" placeholder="请输入"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">设备:</span>
+        <nz-radio-group [(ngModel)]="edit.data['device']" [nzButtonStyle]="'solid'">
+          <label nz-radio-button nzValue="0">全部</label>
+          <label nz-radio-button nzValue="1">电脑端</label>
+          <label nz-radio-button nzValue="2">手机端</label>
+        </nz-radio-group>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">排序:</span>
+        <input nz-input [(ngModel)]="edit.data['sort']" placeholder="请输入"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">状态:</span>
+        <nz-switch [(ngModel)]="edit.data['status']" nzCheckedChildren="启用" nzUnCheckedChildren="停用"></nz-switch>
+      </section>
+      <button nz-button nzType="primary" (click)="submitHandler()" [nzLoading]="edit.loading" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+</nz-content>

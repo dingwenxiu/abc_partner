@@ -1,0 +1,104 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzType="primary" nzSize="small" (click)="add(0)">设置权限</button>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">ID</th>
+            <th nzWidth="10%">类型</th>
+            <th nzWidth="15%">详细类型</th>
+            <th nzWidth="15%">管理员</th>
+            <th nzWidth="20%">创建时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-item [ngForOf]="tableList" let-i="index">
+            <tr>
+              <td>{{item.id}}</td>
+              <td>{{item.type_name}}</td>
+              <td>{{item.type_detail_name}}</td>
+              <td>{{item.users}}</td>
+              <td>{{item.created_at}}</td>
+              <td>
+                <button nzSize="small" nz-button nzType="primary" (click)="add(item)">编辑</button>&nbsp;
+                <button nzSize="small" nz-button nzType="primary" (click)="delCheckUser(item)">删除</button>&nbsp;
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </nz-table>
+      <!-- <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+          (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination> -->
+    </section>
+  </section>
+
+  <nz-drawer [nzClosable]="edit.show" [nzVisible]="edit.show" [nzMaskClosable]='false' nzWidth='auto'
+    nzPlacement="right" [nzTitle]="edit.type ? '编辑' : '添加'" (nzOnClose)="edit.show = false">
+    <section class="drawer-box">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">权限类型:</span>
+        <nz-select [(ngModel)]="edit.data.type" (ngModelChange)="typeChange($event)" nzAllowClear nzPlaceHolder="请选择类型"
+          class="tpl-input" nzSize="small">
+          <nz-option nzValue="" nzLabel=""></nz-option>
+          <nz-option [nzValue]="item.sign" [nzLabel]="item.name" *ngFor="let item of typeList"></nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa" *ngIf="detailList.length > 0">
+        <span class="tpl-title">详细类型:</span>
+        <nz-select [(ngModel)]="edit.data.type_detail" nzAllowClear nzPlaceHolder="请选择类型" class="tpl-input"
+          nzSize="small">
+          <nz-option nzValue="" nzLabel=""></nz-option>
+          <nz-option [nzValue]="item.key" [nzLabel]="item.name" *ngFor="let item of detailList"></nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">管理组:</span>
+        <nz-select [(ngModel)]="edit.userType[0]" nzAllowClear (ngModelChange)="changeType($event, 0)"
+          nzPlaceHolder="请选择管理组" class="tpl-input" nzSize="small">
+          <nz-option nzValue="" nzLabel=""></nz-option>
+          <nz-option [nzValue]="item.value" [nzLabel]="item.label" *ngFor="let item of groupList[0]"></nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">
+          <label *ngIf="adminList[0].length" nz-checkbox [(ngModel)]="checkedAll[0]" (ngModelChange)="updateAllChecked($event, 0)">全选</label>
+        </span>
+        <nz-checkbox-group [(ngModel)]="adminList[0]" (ngModelChange)="updateChecked(0)"></nz-checkbox-group>
+      </section>
+
+      <section class="tpl-list flexa">
+        <span class="tpl-title">管理组:</span>
+        <nz-select [(ngModel)]="edit.userType[1]" nzAllowClear (ngModelChange)="changeType($event, 1)"
+          nzPlaceHolder="请选择管理组" class="tpl-input" nzSize="small">
+          <nz-option nzValue="" nzLabel=""></nz-option>
+          <nz-option [nzValue]="item.value" [nzLabel]="item.label" *ngFor="let item of groupList[1]"></nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">
+          <label *ngIf="adminList[1].length" nz-checkbox [(ngModel)]="checkedAll[1]" (ngModelChange)="updateAllChecked($event, 1)">全选</label>
+        </span>
+        <nz-checkbox-group [(ngModel)]="adminList[1]" (ngModelChange)="updateChecked(1)"></nz-checkbox-group>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">管理组:</span>
+        <nz-select [(ngModel)]="edit.userType[2]" nzAllowClear nzPlaceHolder="请选择管理组"
+          (ngModelChange)="changeType($event, 2)" class="tpl-input" nzSize="small">
+          <nz-option nzValue="" nzLabel=""></nz-option>
+          <nz-option [nzValue]="item.value" [nzLabel]="item.label" *ngFor="let item of groupList[2]"></nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">
+          <label *ngIf="adminList[2].length" nz-checkbox [(ngModel)]="checkedAll[2]" (ngModelChange)="updateAllChecked($event, 2)">全选</label>
+        </span>
+        <nz-checkbox-group [(ngModel)]="adminList[2]" (ngModelChange)="updateChecked(2)"></nz-checkbox-group>
+      </section>
+      <button nz-button nzType="primary" (click)="submitEdit()" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+</nz-content>

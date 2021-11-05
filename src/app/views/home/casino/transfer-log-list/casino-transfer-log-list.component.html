@@ -1,0 +1,391 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+        <tr>
+          <th nzWidth="4%">ID</th>
+          <th nzWidth="6%">帐号</th>
+          <th nzWidth="5%">类型</th>
+          <th nzWidth="3%">测试</th>
+          <th nzWidth="7%">可用余额</th>
+          <th>总额</th>
+          <th>冻结前金额</th>
+          <th nzWidth="6%">冻结余额</th>
+          <th nzWidth="5%">冻结类型</th>
+          <th>描述</th>
+          <th>创建时间</th>
+          <th>操作时间</th>
+          <th nzWidth="3%">状态</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+        <tr *ngFor="let item of tableList">
+          <td>{{item.id}}</td>
+          <td>
+              <a href="javascript:;" class="a-link" (click)="findChild(item.id)">{{item.username}}</a>
+          </td>
+          <td>{{item.type_name}}</td>
+          <td>
+            <ng-container *ngIf="item.is_tester; else elseTemplate">
+              <span style="color: green;">是</span>
+            </ng-container>
+            <ng-template #elseTemplate>
+              <span style="color: red;">否</span>
+            </ng-template>
+          </td>
+          <td>{{item.balance}}</td>
+          <td>{{item.before_balance}}</td>
+          <td>{{item.before_frozen_balance}}</td>
+          <td>{{item.frozen_balance}}</td>
+          <td>{{item.frozen_type}}</td>
+          <td>{{item.desc}}</td>
+          <td>{{item.created_at}}</td>
+          <td>{{item.updated_at}}</td>
+          <td>
+            <ng-container *ngIf="item.status; else elseTemplate">
+              <i nz-icon [nzType]="'check'" [nzTheme]="'outline'" style="color: green;"></i>
+            </ng-container>
+            <ng-template #elseTemplate>
+              <i nz-icon [nzType]="'close'" [nzTheme]="'outline'" style="color: red;"></i>
+            </ng-template>
+          </td>
+          <td>
+              <!-- <a href="javascript:;" class="a-link" (click)="doDetail(item)">详情</a>
+              <a href="javascript:;" class="a-link" (click)="doPassword(item)">密码</a>
+              <a href="javascript:;" class="a-link" (click)="doTransfer(item.id)">资金</a>
+              <a href="javascript:;" class="a-link" (click)="doFrozen(item.id)">冻结</a>&nbsp;
+            <nz-switch [(ngModel)]="item.status" [nzControl]='true' (click)="doStatus(item)" nzCheckedChildren="开" nzUnCheckedChildren="关" class="switch"></nz-switch> -->
+            暂无操作选项
+          </td>
+        </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination nzPageSize='15' [nzTotal]="page.total" [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+
+  <!-- 添加直属 --->
+  <nz-drawer
+    [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false"
+    [nzWidth]="720"
+    [nzVisible]="addTopData.show"
+    nzTitle="添加直属"
+    (nzOnClose)="back()"
+  >
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">用户名:</span> <input required nz-input [(ngModel)]="addTopData.data.username" placeholder="请输入登录帐号" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">登录密码:</span> <input nz-input type="password" [(ngModel)]="addTopData.data.password" placeholder="请输入登录密码" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">资金密码:</span> <input nz-input type="password" [(ngModel)]="addTopData.data.fund_password" placeholder="请输入资金密码" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">奖金组:</span> <input nz-input type="password" [(ngModel)]="addTopData.data.prize_group" placeholder="请输入奖金组" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">是否测试:</span><nz-switch [(ngModel)]="addTopData.data.is_test" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
+      </section>
+      <button nz-button nzType="primary" (click)="submitAddTop()" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+
+  <!-- 理赔扣减 --->
+  <nz-drawer
+    [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false"
+    [nzWidth]="720"
+    [nzVisible]="fund.show"
+    nzTitle="理赔扣减"
+    (nzOnClose)="back()"
+  >
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">当前用户:</span>
+        {{fund.username}}
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">当前余额:</span>
+        {{fund.balance}}
+      </section>
+      <nz-tabset>
+        <nz-tab nzTitle="理赔">
+          <section class="tpl-list flexa">
+            <span class="tpl-title">理赔类型:</span>
+            <nz-select style="width: 173px;" [(ngModel)]="fund.add_data.type" nzPlaceHolder="请选择" nzAllowClear>
+              <nz-option *ngFor="let option of fund.transfer_add_options | keyvalue" [nzValue]="option.key" [nzLabel]="option.value.name">
+              </nz-option>
+            </nz-select>
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title">金额:</span> <input required nz-input [(ngModel)]="fund.add_data.amount" placeholder="请输入金额" class="tpl-input" />
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title">资金密码:</span> <input nz-input type="password" [(ngModel)]="fund.add_data.password" placeholder="请输入资金密码" class="tpl-input" />
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title">备注:</span> <input nz-input type="text" [(ngModel)]="fund.add_data.reason" placeholder="请输入原因" class="tpl-input" />
+          </section>
+          <button nz-button nzType="primary" (click)="submitTransfer('add')" class="submit">
+            提交
+          </button>
+        </nz-tab>
+        <nz-tab nzTitle="扣减">
+          <section class="tpl-list flexa">
+            <span class="tpl-title">扣减类型:</span>
+            <nz-select style="width: 173px;" [(ngModel)]="fund.reduce_data.type" nzPlaceHolder="请选择" nzAllowClear>
+              <nz-option *ngFor="let option of fund.transfer_reduce_options | keyvalue" [nzValue]="option.key" [nzLabel]="option.value.name">
+              </nz-option>
+            </nz-select>
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title">金额:</span> <input required nz-input [(ngModel)]="fund.reduce_data.amount" placeholder="请输入金额" class="tpl-input" />
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title">资金密码:</span> <input nz-input type="password" [(ngModel)]="fund.reduce_data.password" placeholder="请输入资金密码" class="tpl-input" />
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title">备注:</span> <input nz-input type="text" [(ngModel)]="fund.reduce_data.reason" placeholder="请输入原因" class="tpl-input" />
+          </section>
+          <button nz-button nzType="primary" (click)="submitTransfer('reduce')" [nzLoading]="fund.fundSubmitButton" class="submit">
+            提交
+          </button>
+        </nz-tab>
+      </nz-tabset>
+    </section>
+  </nz-drawer>
+
+  <!-- 冻结 --->
+  <nz-drawer
+    [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false"
+    [nzWidth]="720"
+    [nzVisible]="frozen.show"
+    nzTitle="玩家冻结"
+    (nzOnClose)="back()"
+  >
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">用户名:</span>
+        {{frozen.username}}
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">当前类型:</span>
+        {{frozen.current_frozen}}
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">冻结类型:</span>
+        <nz-radio-group [(ngModel)]="frozen.data.frozen">
+          <label nz-radio nzValue="{{ option.key}}" *ngFor="let option of frozen.frozen_options | keyvalue">{{option.value}}</label>
+        </nz-radio-group>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">资金密码:</span> <input nz-input type="password" [(ngModel)]="frozen.data.password" placeholder="请输入资金密码" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">备注:</span> <input nz-input type="text" [(ngModel)]="frozen.data.reason" placeholder="请输入原因" class="tpl-input" />
+      </section>
+      <button nz-button nzType="primary" (click)="submitFrozen()" [nzLoading]="fund.fundSubmitButton" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+
+  <!-- 密码 --->
+  <nz-drawer
+    [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false"
+    [nzWidth]="720"
+    [nzVisible]="password.show"
+    nzTitle="修改密码"
+    (nzOnClose)="back()"
+  >
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">用户ID:</span>
+        {{password.id}}
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">用户帐号:</span>
+        {{password.username}}
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">用户昵称:</span>
+        {{password.nickname}}
+      </section>
+      <nz-tabset>
+        <nz-tab nzTitle="登录密码">
+          <section class="tpl-list flexa">
+            <span class="tpl-title">新密码:</span> <input  nz-input [(ngModel)]="password.login_data.password" placeholder="请输入新密码" class="tpl-input" />
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title">确认密码:</span> <input  nz-input [(ngModel)]="password.login_data.confirm_password" placeholder="请确认新密码" class="tpl-input" />
+          </section>
+<!--          <section class="tpl-list flexa">-->
+<!--            <span class="tpl-title">操作人资金密码:</span> <input nz-input type="password" [(ngModel)]="password.login_data.fund_password" placeholder="请输入操作人资金密码" class="tpl-input" />-->
+<!--          </section>-->
+          <section class="tpl-list flexa">
+            <span class="tpl-title">备注:</span> <input nz-input type="text" [(ngModel)]="password.login_data.reason" placeholder="请输入原因" class="tpl-input" />
+          </section>
+          <button nz-button nzType="primary" (click)="submitPassword('login')" [nzLoading]="password.submitButton" class="submit">
+            修改登录密码
+          </button>
+        </nz-tab>
+        <nz-tab nzTitle="资金密码">
+          <section class="tpl-list flexa">
+            <span class="tpl-title">新密码:</span> <input  nz-input [(ngModel)]="password.fund_data.password" placeholder="请输入新密码" class="tpl-input" />
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title">确认密码:</span> <input  nz-input [(ngModel)]="password.fund_data.confirm_password" placeholder="请确认新密码" class="tpl-input" />
+          </section>
+<!--          <section class="tpl-list flexa">-->
+<!--            <span class="tpl-title">操作人资金密码:</span> <input nz-input type="password" [(ngModel)]="password.fund_data.fund_password" placeholder="操作人资金密码" class="tpl-input" />-->
+<!--          </section>-->
+          <section class="tpl-list flexa">
+            <span class="tpl-title">备注:</span> <input nz-input type="text" [(ngModel)]="password.fund_data.reason" placeholder="请输入原因" class="tpl-input" />
+          </section>
+          <button nz-button nzType="primary" (click)="submitPassword('fund')" [nzLoading]="password.submitButton" class="submit">
+            修改资金密码
+          </button>
+        </nz-tab>
+      </nz-tabset>
+    </section>
+  </nz-drawer>
+
+  <!--  详情-->
+  <!-- <nz-drawer
+    [nzClosable]="detail.show"
+    [nzVisible]="detail.show"
+    [nzMaskClosable]= 'false'
+    nzWidth = 'auto'
+    nzPlacement="right"
+    nzTitle="详情"
+    (nzOnClose)="detail.show = false"
+  >
+    <section class="drawer-box">
+      
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="detail.player | keyvalue">
+        <thead class="ant-table-thead">
+        <tr>
+          <th nzWidth="80px">ID</th>
+          <th nzWidth="130px">昵称</th>
+          <th nzWidth="130px">类型</th>
+          <th nzWidth="130px">奖金组</th>
+          <th nzWidth="100px">上级</th>
+          <th nzWidth="120px">余额</th>
+          <th nzWidth="120px">冻结金额</th>
+          <th nzWidth="80px">冻结状态</th>
+        </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+        <tr >
+          <td> {{detail.player.id}} </td>
+          <td> {{detail.player.nickname}} </td>
+          <td> {{detail.player.type}} </td>
+          <td> {{detail.player.prize_group}} </td>
+          <td> {{detail.player.parent_id}} </td>
+          <td> {{detail.account.balance}} </td>
+          <td> {{detail.account.frozen_balance}} </td>
+          <td> {{detail.player.frozen_type}} </td>
+        </tr>
+        </tbody>
+      </nz-table>
+      
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="detail.player | keyvalue">
+        <thead class="ant-table-thead">
+        <tr>
+          <th nzWidth="150px">注册IP</th>
+          <th nzWidth="150px">注册时间</th>
+          <th nzWidth="150px">上次登录IP</th>
+          <th nzWidth="150px">上次登录时间</th>
+        </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+        <tr>
+          <td> {{detail.player.register_ip}}</td>
+          <td> {{toolService.formatTime(detail.player.register_time) }}</td>
+          <td> {{detail.player.last_login_ip}}</td>
+          <td> {{toolService.formatTime(detail.player.last_login_time)}}</td>
+        </tr>
+        </tbody>
+      </nz-table>
+
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="detail.relevant">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="6%">ID</th>
+            <th nzWidth="10%">用户名</th>
+            <th nzWidth="10%">vip</th>
+            <th nzWidth="10%">奖金组</th>
+            <th nzWidth="10%">余额</th>
+            <th nzWidth="10%">冻结金额</th>
+            <th nzWidth="10%">冻结状态</th>
+
+            <th nzWidth="10%">注册Ip</th>
+            <th nzWidth="10%">注册日期</th>
+            <th nzWidth="10%">上次登录IP</th>
+            <th nzWidth="10%">上次登录日期</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of detail.relevant" >
+            <td> {{item.id}} </td>
+            <td> {{item.username}} </td>
+            <td> {{item.vip_level}} </td>
+            <td> {{item.balance}} </td>
+            <td> {{item.frozen}} </td>
+            <td> {{item.frozen_type}} </td>
+            <td> {{item.register_ip}} </td>
+            <td> {{item.register_time}} </td>
+            <td> {{item.last_login_ip}} </td>
+            <td> {{item.last_login_time}} </td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="detail.stat | keyvalue">
+        <thead class="ant-table-thead">
+        <tr>
+          <th nzWidth="7%">总充值</th>
+          <th nzWidth="7%">总提现</th>
+          <th nzWidth="7%">系统理赔</th>
+          <th nzWidth="7%">系统扣减</th>
+          <th nzWidth="7%">总转入</th>
+          <th nzWidth="7%">总转出</th>
+          <th nzWidth="7%">总投注</th>
+          <th nzWidth="7%">总撤单</th>
+          <th nzWidth="7%">总中奖</th>
+          <th nzWidth="7%">总反点</th>
+          <th nzWidth="7%">总工资</th>
+          <th nzWidth="7%">总分红</th>
+          <th nzWidth="7%">总礼金</th>
+        </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+        <tr>
+          <td>{{toolService.computeMoney(detail.stat.recharge_amount, 10000)}}</td>
+          <td>{{toolService.computeMoney(detail.stat.withdraw_amount, 10000)}}</td>
+          <td>{{toolService.computeMoney(detail.stat.system_transfer_add, 10000)}}</td>
+          <td>{{toolService.computeMoney(detail.stat.transfer_from_parent, 10000)}}</td>
+          <td>{{toolService.computeMoney(detail.stat.transfer_to_child, 10000)}}</td>
+          <td>{{toolService.computeMoney(detail.stat.bets, 10000)}}</td>
+          <td>{{toolService.computeMoney(detail.stat.cancel, 10000)}}</td>
+          <td>{{toolService.computeMoney(detail.stat.bonus, 10000)}}</td>
+          <td>{{toolService.computeMoney(detail.stat.points_child, 10000)}}</td>
+          <td>{{toolService.computeMoney(detail.stat.salary, 10000)}}</td>
+          <td>{{toolService.computeMoney(detail.stat.dividend, 10000)}}</td>
+          <td>{{toolService.computeMoney(detail.stat.gift, 10000)}}</td>
+        </tr>
+        </tbody>
+      </nz-table>
+    </section>
+  </nz-drawer> -->
+</nz-content>

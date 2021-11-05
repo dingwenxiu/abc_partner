@@ -1,0 +1,88 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzType="primary" (click)="addNotice(0,0)" nzSize="small">发送站内信</button>&nbsp;&nbsp;&nbsp;
+    <section class="main-content">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" #tableData [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>
+              <button nz-button nzType="primary" nzSize="small" (click)="DelAll()">删除</button>
+              <label nz-checkbox [(ngModel)]="checkedAll" [nzIndeterminate]="indeterminate"
+                (ngModelChange)="DelCheckedAll($event)"></label>
+            </th>
+            <th>ID</th>
+            <th>用户名</th>
+            <th>用户类型</th>
+            <th>标题</th>
+            <th>内容摘要</th>
+            <th>发送时间</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList; let i = index;" (click)="lockTd($event)">
+            <td>
+              <label nz-checkbox [(ngModel)]="checked[i]" (ngModelChange)="DelChecked($event, item.id)"></label>
+            </td>
+            <td>{{item.id}}</td>
+            <td>
+              <p class="text-content">
+                {{item.user_config + ''}}
+              </p>
+            </td>
+            <td>{{item.user_type}}</td>
+            <td>
+              <p class="text-content">
+                {{item.title}}
+              </p>
+            </td>
+            <td id="text-content">
+              <p class="fw text-content" [innerHtml]="item.content"></p>
+            </td>
+            <td>{{item.created_at}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]="'10'" [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<!-- 添加公告 -->
+<nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+  [nzMaskClosable]="false" [nzWidth]="720" [nzVisible]="addNoticePop.pop" nzTitle="公告设置"
+  (nzOnClose)="addNoticePop.pop = false">
+  <section class="tpl-lists">
+    <section class="tpl-list flexa">
+      <span class="tpl-title">用户类型:</span>
+      <nz-select class="tpl-input" [(ngModel)]="addData.data.user_type" (ngModelChange)="userTypeChange($event)"  nzPlaceHolder="选择用户类型" nzAllowClear>
+        <nz-option [nzValue]="'1'" [nzLabel]="'直属'"></nz-option>
+        <nz-option [nzValue]="'2'" [nzLabel]="'代理'"></nz-option>
+        <nz-option [nzValue]="'3'" [nzLabel]="'指定用户'"></nz-option>
+      </nz-select>
+    </section>
+    <section class="tpl-list flexa" *ngIf="addData.data.user_type === '3'">
+      <span class="tpl-title">用户名:</span>
+      <textarea nz-input [nzAutosize]="{ minRows: 2, maxRows: 6 }" [(ngModel)]="addData.data['user_config']"
+        placeholder="多个用户以英文逗号分割" class="tpl-input" nzAutosize></textarea>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">标题:</span> <input nz-input [(ngModel)]="addData.data.title" placeholder="请输入标题"
+        class="tpl-input" />
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">内容:</span>
+      <ueditor style="width:500px;" #full [(ngModel)]="addData.data.content" [config]="{ wordCount: true }"
+        [loadingTip]="'加载中……'" (onReady)="_ready($event)" (onDestroy)="_destroy()" (ngModelChange)="_change($event)">
+      </ueditor>
+    </section>
+    <button nz-button nzType="primary" (click)="submitNotice()" [nzLoading]="api.loadingSwitch" class="submit">
+      提交
+    </button>
+  </section>
+</nz-drawer>
+
+<nz-modal [(nzVisible)]="contentPop.show" [nzCancelText]="null" [nzOkText]="null" nzTitle="内容提示"
+  (nzOnCancel)="contentPop.show = false">
+  <section class="fw content" [innerHtml]="contentPop.data"></section>
+</nz-modal>

@@ -1,0 +1,852 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzType="primary" (click)="addHandler()" nzSize="small">添加活动</button>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper #nzTable [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">ID</th>
+            <th nzWidth="15%">名称</th>
+            <th>轮播图</th>
+            <th>开始时间</th>
+            <th>结束时间</th>
+            <th>启用状态</th>
+            <th nzWidth="8%">首页轮播图</th>
+            <th nzWidth="8%">操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-data let-i="index" [ngForOf]="tableList">
+            <tr>
+              <td>{{data.id}}</td>
+              <td>{{data.name}}</td>
+              <td><img style="width: 100px;" [src]="api.imgUrl + data.img_banner" alt="活动图片"></td>
+              <td>{{data.start_time}}</td>
+              <td>{{data.end_time}}</td>
+              <td>
+                <span *ngIf="+data.status === 1" style="color: green;">启用</span>
+                <span *ngIf="+data.status === 2" style="color: red;">关闭</span>
+              </td>
+              <td>
+                <span *ngIf="+data.home === 1" style="color: green;">是</span>
+                <span *ngIf="+data.home === 2" style="color: red;">否</span>
+              </td>
+              <td>
+                <button nz-button nzSize="small" nzType="primary" (click)="editHandler(data)"
+                  >编辑</button>
+                <button nz-button nzSize="small" nzType="primary" (click)="deleteHandler(data, i)"
+                  >删除</button>
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+
+  <!-- 添加编辑 -->
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="1350" [nzVisible]="edit.show" nzTitle="编辑/添加" (nzOnClose)="edit.show = false">
+    <nz-steps [nzCurrent]="edit.current" nzSize="small">
+      <nz-step nzTitle="基础选项"></nz-step>
+      <nz-step nzTitle="活动设置" *ngIf="edit.data['type'] !== 'active_info'"></nz-step>
+      <nz-step nzTitle="奖品设置" *ngIf="prizeSetting.includes(edit.data['type'])"></nz-step>
+      <nz-step nzTitle="条件设置" *ngIf="possibleSetting.includes(edit.data['type'])"></nz-step>
+    </nz-steps>
+    <!-- 基础选项 -->
+    <section class="tpl-lists" *ngIf="edit.current === 0">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">活动类型:</span>
+        <nz-select style="width: 300px;" [(ngModel)]="edit.data['type']" nzPlaceHolder="选择活动类型"
+          (ngModelChange)="changeType($event)" nzAllowClear>
+          <nz-option *ngFor="let option of typeOptions" [nzValue]="option.type" [nzLabel]="option.name"></nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">活动的别名:</span> <input nz-input [(ngModel)]="edit.data['name']" placeholder="请输入活动的别名"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa" *ngIf="!edit.data['img_info']">
+        <span class="tpl-title">详情图片:</span>
+        <nz-upload [nzAction]="api.uploadImg" [nzData]="{type: 1, test: 0}" (nzChange)='upInfoImages($event)'>
+          <button nz-button><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+        </nz-upload>
+      </section>
+      <section class="tpl-list flexa" *ngIf="edit.data['img_info']">
+        <span class="tpl-title">详情图片:</span>
+        <section class="img-box">
+          <img style="max-height: 100px;max-width: 100px;" [src]="api.imgUrl + edit.data['img_info']">
+          <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="deleteInfoImg()"></i>
+        </section>
+      </section>
+      <section class="tpl-list flexa" *ngIf="!edit.data['img_banner']">
+        <span class="tpl-title">PC轮播图:</span>
+        <nz-upload [nzAction]="api.uploadImg" [nzData]="{type: 1, test: 0}" (nzChange)='upBannerImages($event)'>
+          <button nz-button><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+        </nz-upload>
+      </section>
+      <section class="tpl-list flexa" *ngIf="edit.data['img_banner']">
+        <span class="tpl-title">PC轮播图:</span>
+        <section class="img-box">
+          <img style="max-height: 100px;max-width: 100px;" [src]="api.imgUrl + edit.data['img_banner']">
+          <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="deleteBannerImg()"></i>
+        </section>
+      </section>
+      <section class="tpl-list flexa" *ngIf="!edit.data['img_list']">
+        <span class="tpl-title">手机轮播图:</span>
+        <nz-upload [nzAction]="api.uploadImg" [nzData]="{type: 1, test: 0}" (nzChange)='upListImages($event)'>
+          <button nz-button><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+        </nz-upload>
+      </section>
+      <section class="tpl-list flexa" *ngIf="edit.data['img_list']">
+        <span class="tpl-title">手机轮播图:</span>
+        <section class="img-box">
+          <img style="max-height: 100px;max-width: 100px;" [src]="api.imgUrl + edit.data['img_list']">
+          <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="deleteListImg()"></i>
+        </section>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">PC内容:</span>
+        <ueditor style="width:500px;" #full [(ngModel)]="edit.data['pc_desc']" [config]="{ wordCount: true }"
+          [loadingTip]="'加载中……'" (onReady)="_ready($event)" (onDestroy)="_destroy()" (ngModelChange)="_change($event)">
+        </ueditor>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">H5内容:</span>
+        <ueditor style="width:500px;" #full [(ngModel)]="edit.data['h5_desc']" [config]="{ wordCount: true }"
+          [loadingTip]="'加载中……'" (onReady)="_ready($event)" (onDestroy)="_destroy()" (ngModelChange)="_change($event)">
+        </ueditor>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">开始时间:</span>
+        <nz-date-picker [(ngModel)]="edit.data['start_time']" nzShowTime></nz-date-picker>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">结束时间:</span>
+        <nz-date-picker [(ngModel)]="edit.data['end_time']" nzShowTime></nz-date-picker>
+      </section>
+    </section>
+    <!-- 活动设置 -->
+    <section *ngIf="edit.current === 1">
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'checkin'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">是否禁用:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['status']" nzPlaceHolder="请选择条件" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['status'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['status'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">每天需要达到条件:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['possible']" nzPlaceHolder="请选择条件" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['possible'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['possible'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">条件值:</span>
+          <nz-input-number [(ngModel)]="typeParams['possible_val']" [nzMin]="0" [nzStep]=".1" nzPlaceHolder="请输入条件值"
+            class="tpl-input">
+          </nz-input-number>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">参与人员:</span>
+          <nz-select style="width: 300px;" [nzMaxTagCount]="3" nzMode="multiple" nzPlaceHolder="请选择"
+            [(ngModel)]="typeParams['participants']" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['participants'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['participants'].data[key]">
+            </nz-option>
+          </nz-select>
+          <!-- <nz-select style="width: 300px;" [(ngModel)]="typeParams['participants']" nzPlaceHolder="请选择" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['participants'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['participants'].data[key]"></nz-option>
+          </nz-select> -->
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">首页轮播图:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['home']" nzPlaceHolder="请选择" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['home'].data | objkeys" [nzValue]="key"
+              [nzLabel]="typeOptions[typeOptionsIndex].params['home'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+      </section>
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'turntable' || edit.data['type'] === 'turntable_one'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">是否禁用:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['status']" nzPlaceHolder="请选择条件" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['status'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['status'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">领取方式:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['obtain_type']" nzPlaceHolder="请选择" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['obtain_type'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['obtain_type'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">是否需要审核:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['check']" nzPlaceHolder="请选择" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['check'].data | objkeys" [nzValue]="key"
+              [nzLabel]="typeOptions[typeOptionsIndex].params['check'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">参与人员:</span>
+          <nz-select style="width: 300px;" [nzMaxTagCount]="3" nzMode="multiple" nzPlaceHolder="请选择"
+            [(ngModel)]="typeParams['participants']" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['participants'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['participants'].data[key]">
+            </nz-option>
+          </nz-select>
+          <!-- <nz-select style="width: 300px;" [(ngModel)]="typeParams['participants']" nzPlaceHolder="请选择" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['participants'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['participants'].data[key]"></nz-option>
+          </nz-select> -->
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">首页轮播图:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['home']" nzPlaceHolder="请选择条件" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['home'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['home'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa" *ngIf="!typeParams['img']">
+          <span class="tpl-title">轮盘图片:</span>
+          <nz-upload [nzAction]="api.uploadImg" [nzData]="{type: 1, test: 0}" (nzChange)='upImages($event)'>
+            <button nz-button><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+          </nz-upload>
+        </section>
+        <section class="tpl-list flexa" *ngIf="typeParams['img']">
+          <span class="tpl-title">轮盘图片:</span>
+          <section class="img-box">
+            <img style="max-height: 100px;max-width: 100px;" [src]="api.imgUrl + typeParams['img']">
+            <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="deleteImg()"></i>
+          </section>
+        </section>
+        <div style="margin-left: 130px;">图片尺寸需要为590*590</div>
+        <div style="margin-left: 130px;">每个奖品的角度都需要为等份</div>
+      </section>
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'first_recharge'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">是否禁用:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['status']" nzPlaceHolder="请选择条件" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['status'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['status'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">首页轮播图:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['home']" nzPlaceHolder="请选择条件" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['home'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['home'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+      </section>
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'gift_recharge'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">是否禁用:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['status']" nzPlaceHolder="请选择条件" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['status'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['status'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <!-- <section class="tpl-list flexa">
+          <span class="tpl-title">充值金额:</span>
+          <nz-input-number [(ngModel)]="typeParams['recharge']" [nzMin]="0" [nzStep]=".1" class="tpl-input">
+          </nz-input-number>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">需要达到条件:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['possible']" nzPlaceHolder="请选择" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['possible'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['possible'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">条件值:</span>
+          <nz-input-number [(ngModel)]="typeParams['possible_val']" [nzMin]="0" [nzStep]=".1" nzPlaceHolder="请输入条件值" class="tpl-input">
+          </nz-input-number>
+        </section> -->
+        <!-- <section class="tpl-list flexa">
+          <span class="tpl-title">奖品:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['prize']" nzPlaceHolder="请选择" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['prize'].data | objkeys" [nzValue]="key"
+              [nzLabel]="typeOptions[typeOptionsIndex].params['prize'].data[key]"></nz-option>
+          </nz-select>
+        </section> -->
+        <!-- <section class="tpl-list flexa">
+          <span class="tpl-title">奖品数量:</span>
+          <nz-input-number [(ngModel)]="typeParams['prize_value']" [nzMin]="0" [nzStep]=".1" class="tpl-input">
+          </nz-input-number>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">领取方式:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['obtain_type']" nzPlaceHolder="请选择" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['obtain_type'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['obtain_type'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">是否需要审核:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['check']" nzPlaceHolder="请选择" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['check'].data | objkeys" [nzValue]="key"
+              [nzLabel]="typeOptions[typeOptionsIndex].params['check'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">参与人员:</span>
+          <nz-checkbox-wrapper style="width: 550px;" (nzOnChange)="log($event)">
+              <div nz-row>
+                <div nz-col nzSpan="4" *ngFor="let key of typeOptions[typeOptionsIndex].params['participants'].data | objkeys">
+                  <label nz-checkbox [nzValue]="key">{{typeOptions[typeOptionsIndex].params['participants'].data[key]}}</label>
+                </div>
+              </div>
+            </nz-checkbox-wrapper> -->
+
+        <!-- <nz-select style="width: 300px;" [(ngModel)]="typeParams['participants']" nzPlaceHolder="请选择" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['participants'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['participants'].data[key]"></nz-option>
+          </nz-select> -->
+        <!-- </section> -->
+        <section class="tpl-list flexa">
+          <span class="tpl-title">首页轮播图:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['home']" nzPlaceHolder="请选择条件" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['home'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['home'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+      </section>
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'red_pack_rain'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">是否禁用:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['status']" nzPlaceHolder="请选择条件" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['status'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['status'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">领取方式:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['obtain_type']" nzPlaceHolder="请选择" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['obtain_type'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['obtain_type'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">是否需要审核:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['check']" nzPlaceHolder="请选择" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['check'].data | objkeys" [nzValue]="key"
+              [nzLabel]="typeOptions[typeOptionsIndex].params['check'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">参与人员:</span>
+          <nz-select style="width: 300px;" [nzMaxTagCount]="3" nzMode="multiple" nzPlaceHolder="请选择"
+            [(ngModel)]="typeParams['participants']" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['participants'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['participants'].data[key]">
+            </nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">首页轮播图:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['home']" nzPlaceHolder="请选择条件" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['home'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['home'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+      </section>
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'active_info'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">是否禁用:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['status']" nzPlaceHolder="请选择条件" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['status'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['status'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">首页轮播图:</span>
+          <nz-select style="width: 300px;" [(ngModel)]="typeParams['home']" nzPlaceHolder="请选择条件" nzAllowClear>
+            <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['home'].data | objkeys"
+              [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['home'].data[key]"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">活动详情:</span>
+          <ueditor style="width:500px;" #full [(ngModel)]="typeParams['info']" [config]="{ wordCount: true }"
+            [loadingTip]="'加载中……'" (onReady)="_ready($event)" (onDestroy)="_destroy()"
+            (ngModelChange)="_change($event)"></ueditor>
+        </section>
+      </section>
+    </section>
+    <!-- 奖品设置 -->
+    <section *ngIf="edit.current === 2">
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'checkin'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">奖励个数:</span>
+          <nz-input-number [(ngModel)]="typeParams['cells']" [nzMin]="0" [nzStep]="1"
+            (ngModelChange)="cellsChangeDays($event)" class="tpl-input"></nz-input-number>
+        </section>
+        <nz-table #dataParamsTable [nzData]="dataParams" [nzShowPagination]="false">
+          <thead class="ant-table-thead">
+            <tr>
+              <th>奖品</th>
+              <th>连续签到天数</th>
+              <th>奖品</th>
+              <th>奖品数量</th>
+              <th>领取方式</th>
+              <th>是否需要审核</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of dataParamsTable.data;let i = index">
+              <td>奖品{{i + 1}}</td>
+              <td>
+                <nz-input-number [(ngModel)]="dataParams[i]['checkin_days']" [nzMin]="0" [nzStep]="1"
+                  style="width: 70px;"></nz-input-number>
+              </td>
+              <td>
+                <nz-select style="width: 90px;" [(ngModel)]="dataParams[i]['prize']" nzPlaceHolder="请选择条件" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['prize'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['prize'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="dataParams[i]['prize_value']" [nzMin]="0"
+                  [nzStep]=".1"></nz-input-number>
+              </td>
+              <td>
+                <nz-select style="width: 100px;" [(ngModel)]="dataParams[i]['obtain_type']" nzPlaceHolder="请选择条件"
+                  nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['obtain_type'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['obtain_type'].data[key]">
+                  </nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-select style="width: 110px;" [(ngModel)]="dataParams[i]['check']" nzPlaceHolder="请选择" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['check'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['check'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </section>
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'turntable'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">转盘槽位数量:</span>
+          <nz-input-number [(ngModel)]="typeParams['cells']" [nzMin]="0" [nzStep]="1"
+            (ngModelChange)="cellsChangeTurn($event)" class="tpl-input"></nz-input-number>
+        </section>
+        <nz-table #dataParamsTable [nzData]="dataParams" [nzShowPagination]="false">
+          <thead class="ant-table-thead">
+            <tr>
+              <th>奖品</th>
+              <th>奖品类型</th>
+              <th>奖品数量</th>
+              <th>中奖概率</th>
+              <!-- <th>图片</th> -->
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of dataParamsTable.data;let i = index">
+              <td>奖品{{i + 1}}</td>
+              <td>
+                <nz-select style="width: 90px;" [(ngModel)]="dataParams[i]['prize']" nzPlaceHolder="请选择" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['prize'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['prize'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="dataParams[i]['prize_value']" [nzMin]="0"
+                  [nzStep]="1"></nz-input-number>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="dataParams[i]['probability']" [nzMin]="0"
+                  [nzStep]=".1" [nzFormatter]="formatterPercent" [nzParser]="parserPercent"></nz-input-number>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </section>
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'first_recharge'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">充值奖品数量:</span>
+          <nz-input-number [(ngModel)]="typeParams['cells']" [nzMin]="0" [nzStep]="1"
+            (ngModelChange)="cellsChangeFirst($event)" class="tpl-input"></nz-input-number>
+        </section>
+        <nz-table #dataParamsTable [nzData]="dataParams" [nzShowPagination]="false">
+          <thead class="ant-table-thead">
+            <tr>
+              <th>充值量</th>
+              <th>赠送类型</th>
+              <th>赠送值</th>
+              <th>礼品类型</th>
+              <th>礼品值</th>
+              <th>领取方式</th>
+              <th>参与人员</th>
+              <th>是否审核</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of dataParams;let i = index">
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="data['recharge']" [nzMin]="0" [nzStep]=".1"
+                  class="tpl-input"></nz-input-number>
+              </td>
+              <td>
+                <nz-select style="width: 100px;" [(ngModel)]="data['give_type']" nzPlaceHolder="请选择" (ngModelChange)="giveTypeChange(dataParams[i]['give_type'], i)" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['give_type'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['give_type'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="data['give_val']" [nzMin]="0" [nzStep]=".1"
+                (ngModelChange)="giveValChange(dataParams[i]['give_type'], i)"  class="tpl-input" [nzDisabled]="dataParams[i]['give_type'] === '1'"></nz-input-number>
+              </td>
+              <td>
+                <nz-select style="width: 90px;" [(ngModel)]="data['prize']" nzPlaceHolder="请选择" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['prize'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['prize'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="data['prize_value']" [nzMin]="0" [nzStep]=".1"
+                  class="tpl-input" [nzDisabled]="dataParams[i]['give_type'] === '2'"></nz-input-number>
+              </td>
+              <td>
+                <nz-select style="width: 100px;" [(ngModel)]="data['obtain_type']" nzPlaceHolder="请选择" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['obtain_type'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['obtain_type'].data[key]">
+                  </nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-select style="width: 250px;" [nzMaxTagCount]="3" nzMode="multiple" nzPlaceHolder="请选择"
+                  [(ngModel)]="data['participants']" (ngModelChange)="participantsData($event, i)" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['participants'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['participants'].data[key]">
+                  </nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-select style="width: 110px;" [(ngModel)]="data['check']" nzPlaceHolder="请选择" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['check'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['check'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </section>
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'gift_recharge'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">充值奖品数量:</span>
+          <nz-input-number [(ngModel)]="typeParams['cells']" [nzMin]="0" [nzStep]="1"
+          (ngModelChange)="cellsChangeGift($event)" class="tpl-input"></nz-input-number>
+        </section>
+        <nz-table #dataParamsTable [nzData]="dataParams" [nzShowPagination]="false">
+          <thead class="ant-table-thead">
+            <tr>
+              <!-- <th>参与条件</th>
+              <th>投注量</th> -->
+              <th>充值量</th>
+              <th>赠送类型</th>
+              <th>赠送值</th>
+              <th>礼品类型</th>
+              <th>礼品值</th>
+              <th>领取方式</th>
+              <th>参与人员</th>
+              <th>是否审核</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of dataParams;let i = index">
+              <!-- <td>
+                <nz-select style="width: 90px;" [(ngModel)]="data['possible']" nzPlaceHolder="请选择"
+                  nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['possible'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['possible'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="data['possible_val']" [nzMin]="0"
+                  [nzStep]=".1" class="tpl-input"></nz-input-number>
+              </td> -->
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="data['recharge']" [nzMin]="0" [nzStep]=".1"
+                  class="tpl-input"></nz-input-number>
+              </td>
+              <td>
+                <nz-select style="width: 100px;" [(ngModel)]="data['give_type']" nzPlaceHolder="请选择" (ngModelChange)="giveTypeChange(dataParams[i]['give_type'], i)"
+                  nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['give_type'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['give_type'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="data['give_val']" [nzMin]="0" [nzStep]=".1"
+                (ngModelChange)="giveValChange(dataParams[i]['give_type'], i)"  class="tpl-input" [nzDisabled]="dataParams[i]['give_type'] === '1'"></nz-input-number>
+              </td>
+              <td>
+                <nz-select style="width: 90px;" [(ngModel)]="data['prize']" nzPlaceHolder="请选择" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['prize'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['prize'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="data['prize_value']" [nzMin]="0"
+                  [nzStep]=".1" class="tpl-input" [nzDisabled]="dataParams[i]['give_type'] === '2'"></nz-input-number>
+              </td>
+              <td>
+                <nz-select style="width: 100px;" [(ngModel)]="data['obtain_type']" nzPlaceHolder="请选择"
+                  nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['obtain_type'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['obtain_type'].data[key]">
+                  </nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-select style="width: 250px;" [nzMaxTagCount]="3" nzMode="multiple" nzPlaceHolder="请选择"
+                  [(ngModel)]="data['participants']" (ngModelChange)="participantsData($event, i)"
+                  nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['participants'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['participants'].data[key]">
+                  </nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-select style="width: 110px;" [(ngModel)]="data['check']" nzPlaceHolder="请选择" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['check'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['check'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </section>
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'red_pack_rain'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">订单类型数量:</span>
+          <nz-input-number [(ngModel)]="typeParams['cells']" [nzMin]="0" [nzStep]="1"
+            (ngModelChange)="cellsChangeRed($event)" class="tpl-input"></nz-input-number>
+        </section>
+        <nz-table #dataParamsTable [nzData]="dataParams" [nzShowPagination]="false">
+          <thead class="ant-table-thead">
+            <tr>
+              <th>奖品类型</th>
+              <th>奖品值</th>
+              <th>红包总数</th>
+              <th>有奖励红包</th>
+              <th>单红包限额</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of dataParamsTable.data;let i = index">
+              <td>
+                <nz-select style="width: 100px;" [(ngModel)]="dataParams[i]['prize']" nzPlaceHolder="请选择" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['prize'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['prize'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="dataParams[i]['prize_value']" [nzMin]="0"
+                  [nzStep]=".1" class="tpl-input">
+                </nz-input-number>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="dataParams[i]['total_num']" [nzMin]="0" [nzStep]="1"
+                  class="tpl-input">
+                </nz-input-number>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="dataParams[i]['winning_num']" [nzMin]="0"
+                  [nzStep]="1" class="tpl-input">
+                </nz-input-number>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="dataParams[i]['max_money']" [nzMin]="0" [nzStep]=".1"
+                  class="tpl-input">
+                </nz-input-number>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </section>
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'active_info'">
+        <ng-template ngFor let-data let-i="index" [ngForOf]="cellsList">
+
+        </ng-template>
+      </section>
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'turntable_one'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">转盘槽位数量:</span>
+          <nz-input-number [(ngModel)]="typeParams['cells']" [nzMin]="0" [nzStep]="1"
+            (ngModelChange)="cellsChangeTurn($event)" class="tpl-input"></nz-input-number>
+        </section>
+        <nz-table #dataParamsTable [nzData]="dataParams" [nzShowPagination]="false">
+          <thead class="ant-table-thead">
+            <tr>
+              <th>奖品</th>
+              <th>奖品类型</th>
+              <th>奖品数量</th>
+              <th>中奖概率</th>
+              <th>条件类型</th>
+              <th>彩种类型</th>
+              <th>条件值</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of dataParamsTable.data;let i = index">
+              <td>奖品{{i + 1}}</td>
+              <td>
+                <nz-select style="width: 90px;" [(ngModel)]="dataParams[i]['prize']" nzPlaceHolder="请选择" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['prize'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['prize'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="dataParams[i]['prize_value']" [nzMin]="0"
+                  [nzStep]="1"></nz-input-number>
+              </td>
+              <td>
+                <nz-input-number style="width: 70px;" [(ngModel)]="dataParams[i]['probability']" [nzMin]="0"
+                  [nzStep]=".1"
+                  [nzFormatter]="formatterPercent"
+                  [nzParser]="parserPercent"
+                  ></nz-input-number>
+              </td>
+              <td>
+                <nz-select style="width: 150px;" [(ngModel)]="dataParams[i]['possible']" nzPlaceHolder="请选择" nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['possible'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['possible'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-select style="width: 150px;" [(ngModel)]="dataParams[i]['lottery_sign']" nzPlaceHolder="请选择" nzAllowClear>
+                  <nz-option *ngFor="let key of lotteryOption"
+                    [nzValue]="key.en_name" [nzLabel]="key.cn_name"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-input-number style="width: 100px;" [(ngModel)]="dataParams[i]['possible_val']" [nzMin]="0" [nzStep]=".1" class="tpl-input">
+                </nz-input-number>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </section>
+    </section>
+    <!-- 条件设置 -->
+    <section *ngIf="edit.current === 3">
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'turntable'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">条件数量:</span>
+          <nz-input-number [(ngModel)]="typeParams['possibles']" [nzMin]="0" [nzStep]="1"
+            (ngModelChange)="possibleChangeRed($event)" class="tpl-input"></nz-input-number>
+        </section>
+        <nz-table #possibleTable [nzData]="[1]" [nzShowPagination]="false">
+          <thead class="ant-table-thead">
+            <tr>
+              <th>条件类型</th>
+              <th>彩种类型多选</th>
+              <th>条件值</th>
+              <th>转动次数</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of possibleParams;let i = index">
+              <td>
+                <nz-select style="width: 150px;" [(ngModel)]="possibleParams[i]['possible']" nzPlaceHolder="请选择"
+                  nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['possible'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['possible'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-select style="width: 300px;" nzMode="tags" [(ngModel)]="possibleParams[i]['lottery_sign']"
+                  nzPlaceHolder="请选择" nzAllowClear>
+                  <nz-option *ngFor="let key of lotteryOption" [nzValue]="key.en_name" [nzLabel]="key.cn_name">
+                  </nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-input-number style="width: 100px;" [(ngModel)]="possibleParams[i]['possible_val']" [nzMin]="0"
+                  [nzStep]=".1" class="tpl-input">
+                </nz-input-number>
+              </td>
+              <td>
+                <nz-input-number style="width: 100px;" [(ngModel)]="possibleParams[i]['turn_num']" [nzMin]="0"
+                  [nzStep]="1" class="tpl-input">
+                </nz-input-number>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </section>
+      <section class="tpl-lists" *ngIf="edit.data['type'] === 'red_pack_rain'">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">条件数量:</span>
+          <nz-input-number [(ngModel)]="typeParams['possibles']" [nzMin]="0" [nzStep]="1"
+            (ngModelChange)="possibleChangeRed($event)" class="tpl-input"></nz-input-number>
+        </section>
+        <nz-table #possibleTable [nzData]="possibleParams" [nzShowPagination]="false">
+          <thead class="ant-table-thead">
+            <tr>
+              <th>条件类型</th>
+              <th>条件值</th>
+              <th>红包雨时间</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of possibleTable.data;let i = index">
+              <td>
+                <nz-select style="width: 150px;" [(ngModel)]="possibleParams[i]['possible']" nzPlaceHolder="请选择"
+                  nzAllowClear>
+                  <nz-option *ngFor="let key of typeOptions[typeOptionsIndex].params['possible'].data | objkeys"
+                    [nzValue]="key" [nzLabel]="typeOptions[typeOptionsIndex].params['possible'].data[key]"></nz-option>
+                </nz-select>
+              </td>
+              <td>
+                <nz-input-number style="width: 100px;" [(ngModel)]="possibleParams[i]['possible_val']" [nzMin]="0"
+                  [nzStep]=".1" class="tpl-input">
+                </nz-input-number>
+              </td>
+              <td>
+                <nz-input-number style="width: 100px;" [(ngModel)]="possibleParams[i]['red_pack_time']" [nzMin]="0"
+                  [nzStep]=".1" class="tpl-input">
+                </nz-input-number>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </section>
+    </section>
+    <button nz-button nzType="primary" (click)="nextStep(0)" class="submit" *ngIf="edit.current > 0">
+      上一步
+    </button>
+    <button nz-button nzType="primary" (click)="nextStep(1)" class="submit" [disabled]="!edit.data['type']" *ngIf="
+      (edit.data['type'] === 'active_info' && edit.current < 1) ||
+      (possibleSetting.includes(edit.data['type']) && edit.current < 3) 
+      || 
+      (prizeSetting.includes(edit.data['type']) && edit.current < 2) 
+      ">
+      下一步
+    </button>
+    <button nz-button nzType="primary" (click)="submitHandler()" [nzLoading]="edit.loading" class="submit" *ngIf="
+      (edit.data['type'] === 'active_info' && edit.current === 3) ||
+      (possibleSetting.includes(edit.data['type']) && edit.current === 3) 
+      || 
+      (!possibleSetting.includes(edit.data['type']) && prizeSetting.includes(edit.data['type']) && edit.current === 2) 
+      || 
+      (!possibleSetting.includes(edit.data['type']) && !prizeSetting.includes(edit.data['type']) && edit.current === 1)
+      " [disabled]="!edit.data['type']">
+      提交
+    </button>
+  </nz-drawer>
+</nz-content>

@@ -1,0 +1,91 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="select-lottery serach-tpl">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">管理员:</span>
+        <input nz-input nzSize="small" placeholder="管理员名称" [(ngModel)]="searchData.partner_admin_user"
+          class="tpl-input" />&nbsp;&nbsp;
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">跳转路由:</span>
+        <input nz-input nzSize="small" placeholder="跳转路由" [(ngModel)]="searchData.route"
+          class="tpl-input" />&nbsp;&nbsp;
+      </section>
+      <section class="tpl-list flexa">
+        <button nz-button nzSize="small" nzType="primary" (click)="search()">搜索</button>
+        <button nz-button nzSize="small" nzType="primary" (click)="refresh()">刷新</button>
+      </section>
+    </section>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>ID</th>
+            <th>管理员</th>
+            <th>管理员ID</th>
+            <th>平台</th>
+            <th>IP</th>
+            <th>路由</th>
+            <th>设备</th>
+            <th>天数</th>
+            <th>浏览器</th>
+            <th>代理人</th>
+            <th>创建时间</th>
+            <th>添加时间</th>
+            <th>更新时间</th>
+            <th>操作详情</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.partner_admin_username}}</td>
+            <td>{{item.partner_admin_id}}</td>
+            <td>{{item.platform}}</td>
+            <td>{{item.ip}}</td>
+            <td>{{item.route}}</td>
+            <td>{{item.device}}</td>
+            <td>{{item.day}}</td>
+            <td>{{item.browser}}</td>
+            <td>{{item.agent}}</td>
+            <td>{{item.created_at}}</td>
+            <td>{{item.add_time}}</td>
+            <td>{{item.updated_at}}</td>
+            <td>
+              <button nz-button nzSize="small" nzType="primary" (click)="look(item)">查看</button>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" nzPageSize='15' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<nz-modal [(nzVisible)]="pop.show" nzTitle="操作详情" (nzOnCancel)="pop.show = false" [nzCancelText]="null"
+  [nzOkText]="null" nzWidth="800">
+  <div style="background: #ECECEC;padding:30px;">
+    <div nz-row [nzGutter]="12">
+      <div nz-col [nzSpan]="12">
+        <nz-card nzTitle="原数据">
+          <p>名称: {{pop.data.context['name']}}</p>
+          <p>标识: {{pop.data.context['sign']}}</p>
+          <p>数值: {{pop.data.context['value']}}</p>
+          <p>状态: {{pop.data.context['status'] ? '开启' : '关闭'}}</p>
+          <p>描述: {{pop.data.context['description']}}</p>
+        </nz-card>
+      </div>
+      <div nz-col [nzSpan]="12">
+        <nz-card nzTitle="新数据">
+          <p>名称: {{pop.data.params['name']}}</p>
+          <p>标识: {{pop.data.params['sign']}}</p>
+          <p>数值: {{pop.data.params['value']}}</p>
+          <p>状态: {{pop.data.params['status'] ? '开启' : '关闭'}}</p>
+          <p>描述: {{pop.data.params['description']}}</p>
+        </nz-card>
+      </div>
+    </div>
+  </div>
+</nz-modal>

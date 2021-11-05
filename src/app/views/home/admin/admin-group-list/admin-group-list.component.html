@@ -1,0 +1,99 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzType="primary" (click)="addAdmins(0)" nzSize="small">添加管理组</button>
+    <section class="main-content">
+      <nz-table #nestedTable [nzData]="listOfParentData" [nzShowPagination]='false' [nzPageSize]="api.pageSize">
+        <thead class="ant-table-thead">
+          <tr>
+            <!-- <th nzShowExpand></th> -->
+            <th>组名</th>
+            <th>备注</th>
+            <th>等级</th>
+            <th>添加时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-data [ngForOf]="listOfParentData">
+            <tr>
+              <!-- <td nzShowExpand [(nzExpand)]="data.expand"  *ngIf="data.child.length > 0"></td> -->
+              <!-- <td  *ngIf="data.child.length < 1"></td> -->
+              <td>{{ data.name }}</td>
+              <td>{{ data.remark }}</td>
+              <td>{{ data.level }}</td>
+              <td>{{ data.created_at }}</td>
+              <td>
+                <button nz-button nzType="primary" (click)="adminGroupAclDetail(data)" nzSize="small">权限设置</button>
+                <button nz-button nzType="primary" (click)="addAdmins(data, 1)" nzSize="small"
+                  *ngIf="!(data.level === 1 || groupId === data.id)">编辑</button>
+                <button nz-button nzType="primary" (click)="deleteAdmins(data)" nzSize="small"
+                  *ngIf="!(data.level === 1 || groupId === data.id)">删除</button>
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="page.index" [nzPageSize]='api.pageSize' [nzTotal]="page.total"
+        [(nzPageIndex)]="page.index" (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<!-- 权限设置 -->
+<nz-drawer [nzClosable]="lookPermissions.show" [nzVisible]="lookPermissions.show" [nzMaskClosable]='false'
+  nzWidth='auto' nzPlacement="right" nzTitle="查看权限" (nzOnClose)="lookPermissions.show = false">
+  <section class="drawer-box">
+    <ul class="fw tree-lists">
+      <li class="tree-list" *ngFor="let parent of lookPermissions.data;let i1 = index">
+        <div style="border-bottom: 1px solid rgb(233, 233, 233);">
+          <label nz-checkbox (ngModelChange)="updateAllChecked($event, i1)" [(ngModel)]="parent.checked"
+            [nzIndeterminate]="indeterminate[i1]" [nzDisabled]= "lookPermissions.level === 1 || groupId !== ''" >
+            {{parent.label}}
+          </label>
+        </div>
+        <br />
+        <!-- <nz-checkbox-group 
+        style="margin-left: 20px;" 
+        [nzDisabled]= "lookPermissions.level === 1 || groupId !== ''" 
+        [(ngModel)]="lookPermissions.data[i].childs" 
+        (ngModelChange)="updateSingleChecked(i)"
+        ></nz-checkbox-group> -->
+        <ul class="fw tree-lists" style="margin-left: 20px;">
+          <ng-template ngFor let-childs let-i2="index" [ngForOf]="parent.childs">
+            <li [class]="childs.childs.length ? 'tree-list' : ''">
+              <div style="border-bottom: 1px solid rgb(233, 233, 233);">
+                <label nz-checkbox [(ngModel)]="childs.checked" (ngModelChange)="updateChildAllChecked($event, i1, i2)" [nzDisabled]= "lookPermissions.level === 1 || groupId !== ''" >
+                  {{childs.label}}
+                </label>
+              </div>
+              <br/>
+              <nz-checkbox-group 
+              *ngIf="childs.childs.length"
+              style="margin-left: 20px;"  
+              [(ngModel)]="childs.childs"
+              [nzDisabled]= "lookPermissions.level === 1 || groupId !== ''" 
+              ></nz-checkbox-group>
+            </li>
+          </ng-template>
+        </ul>
+      </li>
+    </ul>
+  </section>
+  <button nz-button nzType="primary" (click)="setAcl()" *ngIf="!(lookPermissions.level === 1 || groupId !== '')">确认</button>
+</nz-drawer>
+<!-- 添加分组 -->
+<nz-drawer [nzClosable]="addAdmin.show" [nzVisible]="addAdmin.show" [nzMaskClosable]='false' nzWidth='auto'
+  nzPlacement="right" [nzTitle]="addAdmin.title" (nzOnClose)="closeConfig()">
+  <section class="tpl-list flexa">
+    <span class="tpl-title">分组名称:</span>
+    <input nz-input type="text" placeholder="请输入" class="tpl-input" [(ngModel)]="addAdmin.data.name" />
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">管理组备注:</span>
+    <input nz-input type="text" placeholder="请输入" class="tpl-input" [(ngModel)]="addAdmin.data.remark" />
+  </section>
+  <button nz-button nzType="primary" (click)="confirmConfig()" class="submit">
+    提交
+  </button>
+</nz-drawer>

@@ -1,0 +1,199 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzType="primary" (click)="export(1)" nzSize="small">导出当前搜索内容</button>
+    &nbsp;&nbsp;
+    <button nz-button class="top-button" nzType="primary" (click)="export(0)" nzSize="small"><i nz-icon
+        nzType="download"></i>导出当前页</button>
+    <section class="main-content">
+      <!-- <nz-radio-group class="fr search-group" nzSize="small" [(ngModel)]="isShowPrivate" [nzButtonStyle]="'solid'">
+        <label nz-radio-button nzValue="1">个人</label>
+        <label nz-radio-button nzValue="2">团队</label>
+      </nz-radio-group> -->
+      <section class="select-lottery serach-tpl">
+        <section class="tpl-list flexa tpl-list-time">
+          <span class="tpl-title">时间:</span>
+          <!-- <nz-range-picker [(ngModel)]="dateRange" nzSize="small" (ngModelChange)="onChange($event)">
+          </nz-range-picker> -->
+          <nz-month-picker
+            [(ngModel)]="dateRange"
+            (ngModelChange)="onChange($event)"
+            nzPlaceHolder="选择月份"
+            nzSize="small"
+          ></nz-month-picker>
+        </section>
+        <section class="tpl-list flexa">
+          <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="search()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>日期</th>
+            <th>注册人数</th>
+            <th>首充人数</th>
+            <th>充值人数</th>
+            <th>提现人数</th>
+            <th>投注人数</th>
+            <th>充值<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>提现<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>理赔<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>扣减<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>投注<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>撤单<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>中奖<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>投返<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>下返<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>转入<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>转出<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>礼金<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>工资<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>分红<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+            <th>余额</th>
+            <th>盈亏<span *ngIf="isShowPrivate=='2'" style="color: red;">(团)</span></th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>
+              {{item.day}}
+            </td>
+            <td>
+              {{item.first_register}}
+            </td>
+            <td>
+              {{item.first_recharge_count}}
+            </td>
+            <td>
+              {{item.recharge_count}}
+            </td>
+            <td>
+              {{item.withdraw_count}}
+            </td>
+            <td>
+              {{item.have_bet}}
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.recharge_amount)}}</span>
+              <span *ngIf="isShowPrivate == '2'">{{item.team_recharge_amount}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.withdraw_amount)}}</span>
+              <span *ngIf="isShowPrivate == '2'">{{item.team_withdraw_amount}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.system_transfer_add)}}</span>
+              <span *ngIf="isShowPrivate == '2'">{{item.team_system_transfer_add}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.system_transfer_reduce)}}</span>
+              <span *ngIf="isShowPrivate == '2'">{{item.team_system_transfer_reduce}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.bets - item.cancel)}}</span>
+              <span *ngIf="isShowPrivate == '2'">{{item.team_bets}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.cancel)}}</span>
+              <span *ngIf="isShowPrivate == '2'">{{item.team_cancel}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.bonus)}}</span>
+              <span *ngIf="isShowPrivate == '2'">{{item.team_bonus}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.commission_from_bet)}}</span>
+              <span *ngIf="isShowPrivate == '2'">{{item.team_commission_from_bet}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.commission_from_child)}}</span>
+              <span *ngIf="isShowPrivate == '2'">{{item.team_commission_from_child}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.transfer_from_parent)}}</span>
+              <span *ngIf="isShowPrivate == '2'">--</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.transfer_to_child)}}</span>
+              <span *ngIf="isShowPrivate == '2'">--</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.gift)}}</span>
+              <span *ngIf="isShowPrivate == '2'">{{item.team_gift}}</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.salary)}}</span>
+              <span *ngIf="isShowPrivate == '2'">--</span>
+            </td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">{{financial(item.dividend)}}</span>
+              <span *ngIf="isShowPrivate == '2'">--</span>
+            </td>
+            <td>{{financial(item.balance)}}</td>
+            <td>
+              <span *ngIf="isShowPrivate == '1'">
+                <span *ngIf="item.profit > 0" style="color: red;">赢:{{financial(item.profit)}}</span>
+                <span *ngIf="item.profit == 0" style="color: grey;">{{financial(item.profit)}}</span>
+                <span *ngIf="item.profit < 0" style="color: green;">输:{{financial(item.profit)}}</span>
+              </span>
+              <span *ngIf="isShowPrivate == '2'">
+                <span *ngIf="item.team_profit > 0" style="color: red;">赢:{{item.team_profit}}</span>
+                <span *ngIf="item.team_profit == 0" style="color: grey;">{{item.team_profit}}</span>
+                <span *ngIf="item.team_profit < 0" style="color: green;">输:{{item.team_profit}}</span>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="color: green;">总计:</td>
+            <td>{{financial(totalPage['total_first_register'])}}</td>
+            <td>{{financial(totalPage['total_first_recharge_count'])}}</td>
+            <td>{{financial(totalPage['total_recharge_count'])}}</td>
+            <td>{{financial(totalPage['total_withdraw_count'])}}</td>
+            <td>{{financial(totalPage['total_have_bet'])}}</td>
+            <td>{{financial(totalPage['total_recharge_amount'])}}</td>
+            <td>{{financial(totalPage['total_withdraw_amount'])}}</td>
+            <td>{{financial(totalPage['total_system_transfer_add'])}}</td>
+            <td>{{financial(totalPage['total_system_transfer_reduce'])}}</td>
+            <td>{{financial(totalPage['total_bets'] - totalPage['total_cancel'])}}</td>
+            <td>{{financial(totalPage['total_cancel'])}}</td>
+            <td>{{financial(totalPage['total_bonus'])}}</td>
+            <td>{{financial(totalPage['total_commission_from_bet'])}}</td>
+            <td>{{financial(totalPage['total_commission_from_child'])}}</td>
+            <td>{{financial(totalPage['total_transfer_from_parent'])}}</td>
+            <td>{{financial(totalPage['total_transfer_to_child'])}}</td>
+            <td>{{financial(totalPage['total_gift'])}}</td>
+            <td>{{financial(totalPage['total_salary'])}}</td>
+            <td>{{financial(totalPage['total_dividend'])}}</td>
+            <td>{{financial(totalPage['total_balance'])}}</td>
+            <td>
+              <span *ngIf="totalPage['total_profit'] > 0" style="color: red;">赢:{{financial(totalPage['total_profit'])}}</span>
+              <span *ngIf="totalPage['total_profit'] == 0" style="color: grey;">{{financial(totalPage['total_profit'])}}</span>
+              <span *ngIf="totalPage['total_profit'] < 0" style="color: green;">输:{{financial(totalPage['total_profit'])}}</span>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <!-- <nz-pagination [nzPageIndex]="page.index" [nzPageSize]='api.pageSize' [nzTotal]="page.total"
+        [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination> -->
+    </section>
+  </section>
+</nz-content>
+
+<nz-modal [(nzVisible)]="exportPop.show" nzTitle="导出" (nzOnCancel)="exportPop.show = false" [nzOkText]="null"
+  [nzCancelText]="null">
+  <ng-container *ngIf="!exportPop.loading; else elseTemplate">
+    <section class="export-content">
+      <button nz-button nzType="primary" nzSize="large" style="width: 30rem" (click)="exportAllPage()"><i nz-icon
+          nzType="download"></i>Download</button>
+    </section>
+  </ng-container>
+  <ng-template #elseTemplate>
+    <section class="export-content">
+      <button nz-button nzType="primary" nzSize="large" style="width: 30rem" (click)="stopDownload()"><i nz-icon
+          [nzType]="'sync'" [nzSpin]="true"></i>停止下载</button>
+    </section>
+  </ng-template>
+</nz-modal>

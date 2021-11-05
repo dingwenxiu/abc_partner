@@ -1,0 +1,76 @@
+@import '../../style.css';
+
+
+
+
+.lott-time{
+    display: inline-block;
+    margin-right: 16px;
+    font-size: 18px;
+    font-weight: 800;
+  
+  }
+  .input-item{
+    width: 60px;
+    margin-right: 30px;
+    height: 30px;
+  }
+  .input-box{
+    width: 100%;
+    display: -webkit-flex;
+    display: flex;
+  
+  
+  }
+  
+  pre {
+    outline: 1px solid #ccc;
+    padding: 5px;
+    margin: 5px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
+  .string {
+    color: green;
+  }
+  
+  .number {
+    color: darkorange;
+  }
+  
+  .boolean {
+    color: blue;
+  }
+  
+  .null {
+    color: magenta;
+  }
+  
+  .key {
+    color: red;
+  }
+
+  .select-lottery{
+    display: flex;
+    flex-flow: row wrap;
+  }
+  
+  .tpl-title-search{
+    width: 75px;
+  }
+  
+
+  .tpl-method-set-list{
+    width: 590px;
+    padding: 10px;
+    margin: 6px;
+  }
+  
+  .tpl-input{
+    width: 200px;
+  }
+
+.tpl-list-lr{
+  width:275px;
+}

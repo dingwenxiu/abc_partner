@@ -1,0 +1,503 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <button nz-button nzType="primary" (click)="cleanHandler()" nzSize="small">刷新前台缓存</button>
+      <nz-tabset (nzSelectChange)="changeTabset($event)">
+        <nz-tab nzTitle="首页图标">
+          <!-- <span class="tpl-title">上传类型:</span>
+          <nz-select style="width:150px;" [(ngModel)]="logoType" (ngModelChange)="changeLogoFileType($event)"
+            nzAllowClear nzPlaceHolder="选择上传类型">
+            <nz-option *ngFor="let key of logoFileNameArray;" [nzValue]="key" [nzLabel]="logoFileName[key]"></nz-option>
+          </nz-select> -->
+          <!-- <section class="tpl-list flexa">
+            <nz-upload class="upload-list-inline" [nzAction]="api.domain + '/partner-api/system/logoUpLoadImg'"
+              (nzChange)="logoUpImages($event, 'logo_image_pc_2')" [nzData]="{type: 'logo_image_pc_2'}">
+              <button nz-button><i nz-icon nzType="upload"></i><span>上传PC其他图标</span></button>
+            </nz-upload>
+            <nz-upload class="upload-list-inline" [nzAction]="api.domain + '/partner-api/system/logoUpLoadImg'"
+              (nzChange)="logoUpImages($event, 'logo_image_pc_1')" [nzData]="{type: 'logo_image_pc_1'}">
+              <button nz-button><i nz-icon nzType="upload"></i><span>上传PC图标</span></button>
+            </nz-upload>
+            <nz-upload class="upload-list-inline" [nzAction]="api.domain + '/partner-api/system/logoUpLoadImg'"
+              (nzChange)="logoUpImages($event, 'logo_image_h5_2')" [nzData]="{type: 'logo_image_h5_2'}">
+              <button nz-button><i nz-icon nzType="upload"></i><span>上传移动端其他图标</span></button>
+            </nz-upload>
+            <nz-upload class="upload-list-inline" [nzAction]="api.domain + '/partner-api/system/logoUpLoadImg'"
+              (nzChange)="logoUpImages($event, 'logo_image_h5_1')" [nzData]="{type: 'logo_image_h5_1'}">
+              <button nz-button><i nz-icon nzType="upload"></i><span>上传移动端图标</span></button>
+            </nz-upload>
+            <nz-upload class="upload-list-inline" [nzAction]="api.domain + '/partner-api/system/logoUpLoadImg'"
+              (nzChange)="logoUpImages($event, 'logo_icon')" [nzData]="{type: 'logo_icon'}">
+              <button nz-button><i nz-icon nzType="upload"></i><span>上传首页icon图标</span></button>
+            </nz-upload>
+          </section>
+          <section class="tpl-list flexa">
+            <ng-template ngFor let-item let-i="index" [ngForOf]="logoFileList">
+              <section class="img-box" *ngIf="item.url">
+                <p>{{item.name}}</p>
+                <img style="max-height: 150px;max-width: 150px;" [src]='api.imgUrl + item.url'>
+                <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="removeLogo(item, i)"></i>
+              </section>
+            </ng-template>
+          </section> -->
+          <section class="tpl-list flexa">
+            <ng-template ngFor let-item let-i="index" [ngForOf]="logoUrls | objkeys">
+              <div class="imgList">
+                <nz-upload class="upload-list-inline" [nzAction]="api.domain + '/partner-api/system/logoUpLoadImg'"
+                  (nzChange)="logoUpImages($event, item)" [nzData]="{type: item}">
+                  <button nz-button><i nz-icon nzType="upload"></i><span>上传{{logoFileName[item]}}图标</span></button>
+                </nz-upload>
+                <section class="img-box" *ngIf="logoUrls[item]">
+                  <img style="max-height: 150px;max-width: 150px;" [src]="api.imgUrl + logoUrls[item] + '?' + random">
+                  <!-- <span class="imgbg"
+                    [ngStyle]="{'background-image': 'url('+ api.imgUrl + logoUrls[item] + '?' + random +')'}"></span> -->
+                  <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="removeLogo(item, i)"></i>
+                </section>
+              </div>
+            </ng-template>
+          </section>
+        </nz-tab>
+        <nz-tab nzTitle="二维码">
+          <!-- <span class="tpl-title">上传类型:</span>
+          <nz-select style="width:150px;" [(ngModel)]="codeType" (ngModelChange)="changeCodeFileType($event)"
+            nzAllowClear nzPlaceHolder="选择上传类型">
+            <nz-option *ngFor="let key of codeFileNameArray" [nzValue]="key" [nzLabel]="codeFileName[key]"></nz-option>
+          </nz-select> -->
+          <!-- <section class="tpl-list flexa" *ngIf="!codeUrl">
+            <nz-upload class="upload-list-inline" [nzAction]="api.domain + '/partner-api/admin/editUpLoadImg'"
+              (nzChange)="codeUpImages($event, 'qr_code_2')" [nzData]="{type: 'qr_code_2'}">
+              <button nz-button><i nz-icon nzType="upload"></i><span>上传IOS二维码</span></button>
+            </nz-upload>
+            <nz-upload class="upload-list-inline" [nzAction]="api.domain + '/partner-api/admin/editUpLoadImg'"
+              (nzChange)="codeUpImages($event, 'qr_code_1')" [nzData]="{type: 'qr_code_1'}">
+              <button nz-button><i nz-icon nzType="upload"></i><span>上传安卓二维码</span></button>
+            </nz-upload>
+          </section>
+          <section class="tpl-list flexa">
+            <ng-template ngFor let-item let-i="index" [ngForOf]="codeFileList">
+              <section class="img-box" *ngIf="item.url">
+                <p>{{item.name}}</p>
+                <img style="max-height: 150px;max-width: 150px;" [src]='api.imgUrl + item.url'>
+                <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="removeCode(item, i)"></i>
+              </section>
+            </ng-template>
+          </section> -->
+          <section class="tpl-list flexa">
+            <ng-template ngFor let-item let-i="index" [ngForOf]="codeUrls | objkeys">
+              <div class="imgList" *ngIf="codeFileName[item]">
+                <nz-upload class="upload-list-inline" [nzAction]="api.domain + '/partner-api/admin/editUpLoadImg'"
+                  (nzChange)="codeUpImages($event, item)" [nzData]="{type: item}">
+                  <button nz-button><i nz-icon nzType="upload"></i><span>上传{{codeFileName[item]}}图标</span></button>
+                </nz-upload>
+                <section class="img-box" *ngIf="codeUrls[item]">
+                  <img style="max-height: 125px;max-width: 125px;" [src]="api.imgUrl + codeUrls[item] + '?' + random">
+                  <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="removeCode(item, i)"></i>
+                </section>
+              </div>
+            </ng-template>
+          </section>
+        </nz-tab>
+        <nz-tab nzTitle="首页菜单">
+          <button nz-button nzType="primary" (click)="addNavList(0)" nzSize="small">添加导航菜单</button>
+          <nz-table #basicTable [nzData]="tableList">
+            <thead class="ant-table-thead">
+              <tr>
+                <th>ID</th>
+                <th>名称</th>
+                <th>样式</th>
+                <th>路径</th>
+                <th>平台编号</th>
+                <th>状态</th>
+                <th nzWidth="10%">排序</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody class="ant-table-tbody">
+              <tr *ngFor="let data of tableList;let i = index" [class]="i === removeIndex ? 'remove-tr' : ''">
+                <td>{{data.id}}</td>
+                <td>{{data.name}}</td>
+                <td>{{+data.style === 1 ? '普通菜单' : '娱乐城'}}</td>
+                <td>{{data.url}}</td>
+                <td *ngIf="data.casino_plat_id">
+                  <ng-container *ngFor="let item of data.platM; let index = index">
+                    {{item.name}}
+                    <ng-container *ngIf="index !== data.platM.length - 1">,</ng-container>
+                  </ng-container>
+                  ({{data.casino_plat_id}})
+                </td>
+                <td *ngIf="!data.casino_plat_id">无</td>
+                <td>
+                  <span *ngIf="data.home" style="color: green;">开启</span>
+                  <span *ngIf="!data.home" style="color: red;">关闭</span>
+                </td>
+                <td>
+                  <button nz-button nzType="primary" nzSize="small" nzSearch
+                    (click)='partnerAdminNavigationModify(data)'>修改</button>
+                  <!-- <nz-input-group nzSearch nzSize="small" [nzAddOnAfter]="suffixButton" style="width: 190px;">
+                    <nz-input-number [(ngModel)]="data['order']" [nzMin]="1" [nzStep]="1" nzSize="small">
+                    </nz-input-number>
+                    <button nz-button nzType="primary" (click)="partnerAdminNavigationSet(data.id, data['order'])"
+                      nzSize="small" nzSearch>修改排序</button>
+                  </nz-input-group> -->
+                </td>
+                <td>
+                  <button nz-button nzType="primary" (click)="addNavList(data)" nzSize="small">编辑</button>
+                  <button nz-button nzType="primary" (click)="deleteNavList(data, i)" nzSize="small">删除</button>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </nz-tab>
+        <nz-tab nzTitle="首页模块">
+          <!-- <button nz-button nzType="primary" (click)="partnerAdminCacheClean()" nzSize="small">刷新前台缓存</button> -->
+          <nz-tabset (nzSelectChange)="changeOtherTabset($event)">
+            <ng-template ngFor let-item let-i="index" [ngForOf]="otherList">
+              <nz-tab [nzTitle]="item['name']" (nzClick)="changeOther(item)" class="status-off"
+                *ngIf="item.sign !== 'templateColor'">
+                <button nz-button nzType="primary" (click)="addIndexModuleList(item)"
+                  nzSize="small">添加{{item['name']}}</button> &nbsp;&nbsp;
+              </nz-tab>
+            </ng-template>
+          </nz-tabset>
+          <nz-table #ContentTable [nzData]="homeContentList" [nzShowPagination]="false" [nzPageSize]="999">
+            <thead class="ant-table-thead">
+              <tr>
+                <th>ID</th>
+                <th>序列</th>
+                <th>名称</th>
+                <th>排序</th>
+                <th *ngIf="uploadTWO.includes(otherData['showName']) || otherData['showName'] === '热门彩票'">广告图片</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody class="ant-table-tbody">
+              <tr *ngFor="let data of homeContentList; let i = index;" [class]="i === removeIndex ? 'remove-tr' : ''">
+                <td>{{data.id}}</td>
+                <td>{{'第' + data.order + '位'}}</td>
+                <td>{{data['method_name'] ? (data['lottery_name'] + '/' + data['method_name']) : data['lottery_name']}}
+                </td>
+                <td>
+                  <button nz-button nzType="primary" nzSize="small" nzSearch
+                    (click)='indexModuleModify(data)'>修改</button>
+                </td>
+                <td *ngIf="uploadTWO.includes(otherData['showName']) || otherData['showName'] === '热门彩票'">
+                  <span *ngIf="otherData['showName'] === '热门彩票'">
+                    <ng-container *ngIf="!data.ad_img; else elseImg">
+                      <nz-upload [nzAction]="api.domain + '/partner-api/lottery/lotteryAdImgUpload'"
+                        [nzData]="{lottery_sign: data.lottery_sign}" (nzChange)='upImage($event, i)'>
+                        <button nz-button nzSize="small"><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+                      </nz-upload>
+                    </ng-container>
+                    <ng-template #elseImg>
+                      <img [src]="api.imgUrl + data.ad_img"
+                        style="width: 55px; height: 55px; padding: 3px;margin-right: 10px;" />
+                      <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="delete(data, i)"></i>
+                    </ng-template>
+                  </span>
+                  <span *ngIf="uploadTWO.includes(otherData['showName'])">
+                    <ng-container *ngIf="!data.ad_img; else elseImg">
+                      <nz-upload [nzAction]="api.domain + '/partner-api/casino/adImgUpload'"
+                        [nzData]="{method_id: data.method_id, platforms: data.main_game_plat_code}"
+                        (nzChange)='upImage($event, i)'>
+                        <button nz-button nzSize="small"><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+                      </nz-upload>
+                    </ng-container>
+                    <ng-template #elseImg>
+                      <img [src]="api.imgUrl + data.ad_img"
+                        style="width: 55px; height: 55px; padding: 3px;margin-right: 10px;" />
+                      <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="deleteTwo(data, i)"></i>
+                    </ng-template>
+                  </span>
+                </td>
+                <td>
+                  <button nz-button nzType="primary" (click)="deleteIndexModuleList(data, i)" nzSize="small">删除</button>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </nz-tab>
+        <nz-tab nzTitle="客服">
+          <button *ngIf="csListData.id === ''" nz-button nzType="primary" (click)="csAdd()" nzSize="small">设置客服</button>
+          <button *ngIf="csListData.id !== ''" nz-button nzType="primary" (click)="csEdit(csListData)"
+            nzSize="small">编辑客服</button>
+          <nz-card style="margin-top: 20px;" nzTitle="当前客服地址">
+            <ng-container *ngIf="csListData.cs_url; else elseCsTemplate">
+              <p *ngIf="csListData.cs_url;"><a [href]="csListData.cs_url" target="_blank">{{csListData.cs_url}}</a></p>
+            </ng-container>
+            <ng-template #elseCsTemplate>
+              <nz-empty [nzNotFoundContent]="contentTpl">
+                <ng-template #contentTpl>
+                  <span>
+                    无客服
+                    <a *ngIf="csListData.id === ''" (click)="csAdd()">设置</a>
+                    <a *ngIf="csListData.id !== ''" (click)="csEdit(csListData)">设置地址</a>
+                  </span>
+                </ng-template>
+              </nz-empty>
+            </ng-template>
+          </nz-card>
+        </nz-tab>
+        <nz-tab nzTitle="机器人设置">
+          <i nz-icon nzType="question-circle" nzTheme="outline"></i><a href="javascript:;" class="a-link"
+            (click)="showHelp()">查看帮助</a>
+          <nz-list nzBordered [nzHeader]="'机器人设置'" [nzFooter]="''" style="margin-top: 20px;">
+            <nz-list-item *ngFor="let data of telegramList">
+              <input nz-input type="text" placeholder="渠道名称" class="tpl-input"
+                [(ngModel)]="data.channel_group_name" />&nbsp;&nbsp;
+              <input nz-input type="text" placeholder="渠道ID" class="tpl-input"
+                [(ngModel)]="data.channel_id" />&nbsp;&nbsp;
+              <a href="javascript:;" class="a-link" (click)="telegramEdit(data)">编辑</a>&nbsp;&nbsp;
+              <a href="javascript:;" class="a-link" (click)="telegramGenId(data.id)">生成ID</a>
+            </nz-list-item>
+          </nz-list>
+        </nz-tab>
+        <nz-tab nzTitle="主题配色">
+          <dd style="width: 500px;">
+            <nz-descriptions nzTitle="颜色列表" nzBordered [nzColumn]="{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }">
+              <ng-template ngFor let-data let-i="index" [ngForOf]="colorList">
+                <nz-descriptions-item [nzTitle]="data.lottery_name">
+                  <nz-input-group nzCompact>
+                    <input class="colorControl" [(colorPicker)]="data.value" [style.background]="data.value" [id]="'colorInput' + i"/>
+                    <button nz-button nzType="primary" nzSize="small" style="position: absolute;left: 100px;" (click)="addColor(data, data.value)">更新颜色</button>
+                  </nz-input-group>
+                </nz-descriptions-item>
+              </ng-template>
+            </nz-descriptions>
+          </dd>
+        </nz-tab>
+        <nz-tab nzTitle="广告位图片">
+          <button nz-button nzType="primary" (click)="setAdvertising()" nzSize="small">添加</button>
+          <section class="select-lottery serach-tpl">
+            <section class="tpl-list flexa">
+              <span class="tpl-title tpl-title-search">类型:</span>
+              <nz-select class="tpl-input" nzSize="small" nzPlaceHolder="选择类型" [(ngModel)]="searchAdvertising['type']" (ngModelChange)="searchAdvertisingType($event)" nzAllowClear class="tpl-input">
+                <nz-option nzLabel="全部" nzValue=""></nz-option>
+                <nz-option *ngFor="let item of advertisingType;" [nzValue]="item.key" [nzLabel]="item.name"></nz-option>
+              </nz-select>
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title tpl-title-search">模块:</span>
+              <nz-select class="tpl-input" nzSize="small" nzPlaceHolder="选择模块" [(ngModel)]="searchAdvertising['module_sign']" (ngModelChange)="searchAdvertisingModule($event)" nzAllowClear class="tpl-input">
+                <nz-option nzLabel="全部" nzValue=""></nz-option>
+                <nz-option *ngFor="let item of advertisingModule;" [nzValue]="item.key" [nzLabel]="item.name"></nz-option>
+              </nz-select>&nbsp;&nbsp;
+            </section>
+            <section class="tpl-list flexa">
+              <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="getAdvertising()"><i nz-icon type="search"></i>搜索</button>&nbsp;
+              <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="reSearchAdvertisingModule()"><i nz-icon type="sync"></i>重置</button>&nbsp;
+            </section>
+          </section>
+          <nz-table #ContentTable [nzData]="advertisingList" [nzShowPagination]="false" [nzPageSize]="999">
+            <thead class="ant-table-thead">
+              <tr>
+                <th>ID</th>
+                <th>标题</th>
+                <th>地址</th>
+                <th>类型</th>
+                <th>图片</th>
+                <th>模块</th>
+                <th>模块内容</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody class="ant-table-tbody">
+              <tr *ngFor="let item of advertisingList; let i = index;">
+                <td>{{item.id}}</td>
+                <td>{{item.title}}</td>
+                <td>{{item.url}}</td>
+                <td>{{item.type_name}}</td>
+                <td>
+                  <img *ngIf="item.img" style="max-height: 50px;max-width: 50px;" [src]="api.imgUrl + item.img + '?' + random">
+                </td>
+                <td>{{item.module_name}}</td>
+                <td>
+                  <p class="text-content">
+                    {{item.sign_name ? item.sign_name : item.sign}}
+                  </p>
+                </td>
+                <td>
+                  <button nz-button nzType="primary" (click)="setAdvertising(item)" nzSize="small">编辑</button>
+                  <button nzType="primary" nzSize="small" nz-button (click)="delAdvertising(item.id)">删除</button>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </nz-tab>
+      </nz-tabset>
+    </section>
+  </section>
+</nz-content>
+
+<!-- 编辑 添加 导航菜单 -->
+<nz-modal [(nzVisible)]="navEdit.show" [nzTitle]="navEdit.type ? '编辑导航菜单' : '添加导航菜单'"
+  (nzOnCancel)="navEdit.show = false" (nzOnOk)="confrimNavList()">
+  <section class="tpl-list flexa">
+    <span class="tpl-title">名称:</span>
+    <input nz-input type="text" placeholder="请输入" style="width: 230px;" [(ngModel)]="navEdit.data['name']" />
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">路径:</span>
+    <ng-container *ngIf="inputUrlType; else elseUrlTemplate">
+      <nz-input-group nzCompact>
+        <nz-select style="width: 230px;" [(ngModel)]="navEdit.data['url']" nzAllowClear nzPlaceHolder="请输入">
+          <nz-option nzValue="/games-page/e-game" nzLabel="电子"></nz-option>
+          <nz-option nzValue="/games-page/card" nzLabel="棋牌"></nz-option>
+          <nz-option nzValue="/fish-game" nzLabel="捕鱼"></nz-option>
+          <nz-option nzValue="/active" nzLabel="优惠活动"></nz-option>
+          <nz-option nzValue="/user-trends" nzLabel="走势图"></nz-option>
+          <nz-option nzValue="/live" nzLabel="真人"></nz-option>
+        </nz-select>
+        <button nz-button nzType="primary" nzSearch (click)="changeInputUrlType()">自定义</button>
+      </nz-input-group>
+    </ng-container>
+    <ng-template #elseUrlTemplate>
+      <nz-input-group nzSearch [nzAddOnAfter]="suffixButton">
+        <input style="width: 230px;" nz-input type="text" style="width: 235px;" placeholder="请输入"
+          [(ngModel)]="navEdit.data['url']" />
+      </nz-input-group>
+      <ng-template #suffixButton>
+        <button nz-button nzType="primary" nzSearch (click)="changeInputUrlType()">选项</button>
+      </ng-template>
+    </ng-template>
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">样式:</span>
+    <nz-select style="width: 230px;" [(ngModel)]="navEdit.data['style']" nzAllowClear nzPlaceHolder="请输入">
+      <nz-option nzValue="1" nzLabel="普通菜单"></nz-option>
+      <nz-option nzValue="2" nzLabel="娱乐城"></nz-option>
+    </nz-select>
+  </section>
+  <section class="tpl-list flexa" *ngIf="navEdit.data['style'] == '2'">
+    <span class="tpl-title">平台:</span>
+    <nz-checkbox-group [(ngModel)]="casino_options" style="width:300px;"></nz-checkbox-group>
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">状态:</span>
+    <nz-switch [(ngModel)]="navEdit.data['home']" nzCheckedChildren="开启" nzUnCheckedChildren="关闭"></nz-switch>
+  </section>
+</nz-modal>
+
+<!-- 编辑 添加首页模块 -->
+<nz-modal [nzVisible]="indexModuleEdit.show" [nzTitle]="'添加首页模块'" (nzOnCancel)="indexModuleEdit.show = false"
+  (nzOnOk)="confrimIndexModuleList()" [nzOkLoading]="api.loadingSwitch">
+  <section class="tpl-list flexa">
+    <span class="tpl-title">排序:</span>
+    <nz-select style="width: 64%;" [(ngModel)]="indexModuleEdit.data['order']" nzPlaceHolder="请输入" nzAllowClear>
+      <nz-option *ngFor="let item of indexModuleEdit.max" [nzLabel]="item" [nzValue]="item"></nz-option>
+    </nz-select>
+  </section>
+  <section *ngIf="indexModuleEdit.style === 2" class="tpl-list flexa">
+    <span class="tpl-title">
+      <button nz-button nzType="primary" (click)="otherSearch()">搜索{{otherData['showName']}}:</button>
+    </span>
+    <input nz-input type="text" placeholder="请输入" style="width: 64%;" [(ngModel)]="otherData['name']" />
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">{{otherData['showName']}}:</span>
+    <nz-select *ngIf="indexModuleEdit.data['m_name'] != 'hot'" style="width: 64%;" nzPlaceHolder="所属活动"
+      [(ngModel)]="indexModuleEdit.data['other_id']">
+      <nz-option *ngFor="let option of otherOptions"
+        [nzLabel]="option.cn_name || (option['lottery_name'] + '/' + option['method_name'])" [nzValue]="option.id">
+      </nz-option>
+    </nz-select>
+    <nz-cascader *ngIf="indexModuleEdit.data['m_name'] == 'hot'" style="width: 64%;" nzPlaceHolder="所属活动"
+      [nzOptions]="otherOptions" [(ngModel)]="otherValues" (ngModelChange)="onChanges($event)"></nz-cascader>
+  </section>
+  <!-- <section class="tpl-list flexa">
+    <span class="tpl-title">状态:</span>
+    <nz-radio-group [(ngModel)]="indexModuleEdit.data['status']" [nzButtonStyle]="'solid'">
+      <label nz-radio-button nzValue="1">开启</label>
+      <label nz-radio-button nzValue="0">关闭</label>
+    </nz-radio-group>
+  </section> -->
+</nz-modal>
+
+<!-- 编辑 添加客服 -->
+<nz-modal [nzVisible]="cs.show" [nzTitle]="'设置客服'" (nzOnCancel)="cs.show = false" (nzOnOk)="csSet()"
+  [nzOkLoading]="api.loadingSwitch">
+  <section class="tpl-list flexa">
+    <span class="tpl-title">客服地址</span>
+    <input nz-input type="text" placeholder="请输入" class="tpl-input" [(ngModel)]="cs.data['cs_url']" />
+  </section>
+</nz-modal>
+
+<!-- 编辑 添加机器人 -->
+<nz-modal [nzVisible]="telegramData.show" [nzTitle]="'机器人组名设置'" (nzOnCancel)="telegramData.show = false"
+  (nzOnOk)="telegramEditSubmit()" [nzOkLoading]="api.loadingSwitch" nzOkText="提交编辑">
+  <nz-descriptions nzBordered [nzColumn]="{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }">
+    <nz-descriptions-item [nzTitle]="'编辑'">
+      <input nz-input type="text" placeholder="请输入Telegram组名称" class="tpl-input"
+        [(ngModel)]="telegramData.data.channel_group_name" />
+    </nz-descriptions-item>
+  </nz-descriptions>
+</nz-modal>
+
+<!-- 首页模块 -->
+<nz-modal [(nzVisible)]="indexModule.show" nzTitle="排序" (nzOnCancel)="indexModule.show = false"
+  (nzOnOk)="indexModuleSet(indexModule.data['id'], indexModule.data['order'])">
+  <section class="tpl-list flexa">
+    <span class="tpl-title">排序:</span>
+    <input nz-input type="text" placeholder="请输入" class="tpl-input" [(ngModel)]="indexModule.data['order']" />
+  </section>
+</nz-modal>
+<!-- 首页菜单 -->
+<nz-modal [(nzVisible)]="partnerAdminNavigationModifys.show" nzTitle="排序"
+  (nzOnCancel)="partnerAdminNavigationModifys.show = false"
+  (nzOnOk)="partnerAdminNavigationSet(partnerAdminNavigationModifys.data['id'], partnerAdminNavigationModifys.data['order'])">
+  <section class="tpl-list flexa">
+    <span class="tpl-title">排序:</span>
+    <input nz-input type="text" placeholder="请输入" class="tpl-input"
+      [(ngModel)]="partnerAdminNavigationModifys.data['order']" />
+  </section>
+</nz-modal>
+
+
+<nz-modal [nzVisible]="advertisingPop.show" nzTitle="广告位图片" (nzOnCancel)="advertisingPop.show = false"
+  (nzOnOk)="saveAdvertising()">
+  <section class="tpl-list flexa">
+    <span class="tpl-title">标题:</span>
+    <input nz-input type="text" placeholder="请输入" class="tpl-input" [(ngModel)]="advertisingPop.data['title']" />
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">类型:</span>
+    <nz-select class="tpl-input" [(ngModel)]="advertisingPop.data['type']" (ngModelChange)="changeAdvertisingType($event)" nzAllowClear nzPlaceHolder="选择类型">
+      <nz-option *ngFor="let item of advertisingType;" [nzValue]="item.key" [nzLabel]="item.name"></nz-option>
+    </nz-select>
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">模块:</span>
+    <!-- <input nz-input type="text" placeholder="请输入" class="tpl-input" [(ngModel)]="advertisingPop.data['module_sign']" /> -->
+    <nz-select class="tpl-input" [(ngModel)]="advertisingPop.data['module_sign']" (ngModelChange)="changeAdvertisingModule($event)" nzAllowClear nzPlaceHolder="请选择">
+      <nz-option *ngFor="let item of advertisingModel;" [nzValue]="item.key" [nzLabel]="item.name"></nz-option>
+    </nz-select>
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">模板内容:</span>
+    <ng-container *ngIf="!advertisingGame; else elseImg">
+      <textarea nz-input placeholder="请输入" [(ngModel)]="advertisingPop.data['sign']"
+      [nzAutosize]="{ minRows: 2, maxRows: 6 }" class="tpl-input"></textarea>
+    </ng-container>
+    <ng-template #elseImg>
+      <nz-select class="tpl-input" [(ngModel)]="advertisingPop.data['sign']" (ngModelChange)="changeAdvertisingSign($event)" nzAllowClear nzPlaceHolder="选择类型">
+        <nz-option *ngFor="let item of advertisingGameOptions;" [nzValue]="item.other_id" [nzLabel]="item.lottery_name"></nz-option>
+      </nz-select>
+    </ng-template>
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">跳转地址:</span>
+    <input nz-input type="text" placeholder="请输入" class="tpl-input" [(ngModel)]="advertisingPop.data['url']" />
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">图片:</span>
+    <nz-upload *ngIf="!advertisingPop.data['img']" [nzAction]="api.uploadImg" [nzData]="{type: 12, test: 0}" (nzChange)='upAdverImage($event)'>
+      <button nz-button><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+    </nz-upload>
+    <section *ngIf="advertisingPop.data['img']" class="img-box">
+      <img style="max-height: 150px;max-width: 150px;" [src]="api.imgUrl + advertisingPop.data['img']">
+      <i nz-icon nzType="close" nzTheme="outline" class="imgClose"
+      nz-popconfirm 
+      (nzOnConfirm)="deleteAdverImage()"
+      nzPopconfirmPlacement="top"></i>
+    </section>
+  </section>
+</nz-modal>

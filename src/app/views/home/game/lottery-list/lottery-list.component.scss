@@ -1,0 +1,53 @@
+@import '../../style.css';
+
+.tbl-icon{
+  width: 40px;
+}
+
+.ant-layout{
+  background:#fff;
+}
+.step-list{
+    padding:10px 20px 10px 20px;
+}
+
+.ant-btn-block {
+    width: 300px;
+}
+
+.add-input{
+    width:90px;
+    padding:0;
+    float:left;
+    text-align:center;
+}
+
+.add-right{
+    margin-right:auto;
+    margin-left:5px;
+}
+
+.add {
+    float: left;
+    width: 29px;
+    height: 32px;
+    line-height: 29px;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 22px;
+    margin-right: 5px;
+    cursor: pointer;
+    outline: aliceblue;
+}
+
+.tpl-lists-flex{
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-between;
+}
+
+.lottery-icon{
+  width: 50px;
+  margin: 5px 0;
+}

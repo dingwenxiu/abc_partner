@@ -1,0 +1,405 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzType="primary" (click)="export(1)" nzSize="small">导出当前搜索内容</button> &nbsp;&nbsp;
+    <button nz-button class="top-button" nzType="primary" (click)="export(0)" nzSize="small"><i nz-icon
+        nzType="download"></i>导出当前页</button>
+    <nz-input-group nzCompact class="refresh">
+      <label nz-checkbox [(ngModel)]="refreshFlag" (ngModelChange)="refresh($event)">自动刷新</label>
+      <nz-select nzSize="small" [(ngModel)]="refreshRate" style="width: 100px;" nzPlaceHolder="请选择刷新频率 默认5秒/次">
+        <nz-option nzLabel="5秒/次" [nzValue]="5000"></nz-option>
+        <nz-option nzLabel="10秒/次" [nzValue]="10000"></nz-option>
+        <nz-option nzLabel="20秒/次" [nzValue]="20000"></nz-option>
+      </nz-select>
+    </nz-input-group>
+    <section class="main-content">
+      <section class="select-lottery serach-tpl">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">用户ID:</span>
+          <input nz-input nzSize="small" placeholder="用户ID" [(ngModel)]="searchData['user_id']"
+            class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">用户名:</span>
+          <input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData['username']"
+            class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">订单号:</span>
+          <input nz-input nzSize="small" placeholder="订单号" [(ngModel)]="searchData['order_id']"
+            class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">充值方式:</span>
+          <!-- <input nz-input nzSize="small" placeholder="充值方式" [(ngModel)]="searchData['channel_sign']"
+            class="tpl-input" />&nbsp;&nbsp; -->
+          <nz-select nzSize="small" [(ngModel)]="searchData['type_sign']" class="tpl-input"  nzPlaceHolder="充值方式">
+            <nz-option [nzLabel]="'全部'" [nzValue]="''"></nz-option>
+            <nz-option *ngFor="let key of chennelOption | objkeys" [nzLabel]="chennelOption[key]" [nzValue]="key"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">渠道:</span>
+          <input nz-input nzSize="small" placeholder="渠道" [(ngModel)]="searchData['platform_child_sign']"
+            class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">处理状态:</span>
+          <nz-select nzSize="small" [(ngModel)]="searchData['status']" nzAllowClear nzPlaceHolder="处理状态"
+            class="tpl-input">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option *ngFor="let item of status_options | keyvalue" nzValue="{{item.key}}" nzLabel="{{item.value}}">
+            </nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa tpl-list-time">
+          <span class="tpl-title">时间:</span>
+          <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)"
+            (click)="timeHandle()" nzShowTime></nz-range-picker>&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="getDataList()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>用户ID</th>
+            <th>用户名</th>
+            <th>用户等级</th>
+            <th>订单号</th>
+            <th>FMIS订单号</th>
+            <th>金额</th>
+            <th>手续费</th>
+            <th>实际上分</th>
+            <th>IP</th>
+            <th>提交时间</th>
+            <th>到账时间</th>
+            <th>充值方式</th>
+            <th>渠道</th>
+            <th>管理员</th>
+            <th>来源</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>
+              <span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.user_id}}</span>
+            </td>
+            <td><span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.username}}</span></td>
+            <td><span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.vip_level}}</span></td>
+            <td><span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.order_id}}</span></td>
+            <td><span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.pay_order_id}}</span></td>
+            <td><span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.amount}}</span></td>
+            <td><span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.fee_amount}}</span></td>
+            <td><span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }"><span
+                  *ngIf="item.real_amount > 0">{{item.real_amount}}</span></span></td>
+            <td><span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.client_ip}}</span></td>
+            <td><span
+                [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.request_time}}</span>
+            </td>
+            <td>
+              <span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.day_m}}</span>
+            </td>
+            <td><span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.channel_name}}</span></td>
+            <td><span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.platform_child_sign}}</span>
+            </td>
+            <!-- <td><span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{utils.formatTime(item.day_m)}}</span></td> -->
+            <td><span [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{item.partner_admin_id}}</span>
+            </td>
+            <td><span
+                [ngStyle]="{'color':item.channel == 'fast' ? 'blue' : 'blank' }">{{from_device[item.from_device]}}</span>
+            </td>
+            <td>
+              <span *ngIf="item.channel == 'fast';else elseBlock" style="color: blue;font-weight: bold;">[快速通道]</span>
+              <ng-template #elseBlock>
+                <span *ngIf='item.status === -1' style="color: red;">充值失败</span>
+                <span *ngIf='item.status === -2' style="color: red;">回调失败</span>
+                <span *ngIf='item.status === -3' style="color: red;">人工失败</span>
+                <span *ngIf='item.status === 0'>初始化</span>
+                <span *ngIf='item.status === 1' style="color: green;">充值成功</span>
+                <span *ngIf='item.status === 2' style="color: green;">回调成功</span>
+                <span *ngIf='item.status === 3' style="color: green;">人工成功</span>
+              </ng-template>
+            </td>
+            <td>
+              <ng-container *ngIf='item.status === 0'>
+                <a href="javascript:;" class="a-link" (click)="rechargeHand(item)">
+                  人工充值
+                </a>
+              </ng-container>
+              <ng-container *ngIf='item.status !== 0'>
+                <a href="javascript:;" class="a-link cgreen">
+                  已处理
+                </a>
+              </ng-container>
+              <a href="javascript:;" class="a-link" (click)="logDetail(item)">日志</a>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3" style="color: green;">本页统计:</td>
+            <td>{{totalPageAmount}}</td>
+            <td>{{totalPageRealAmount}}</td>
+            <td colspan="7"></td>
+          </tr>
+          <tr>
+            <td colspan="3" style="color: green;">总计:</td>
+            <td></td>
+            <td>{{totalRealAmount}}</td>
+            <td colspan="7"></td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+  <!-- 充值详情 -->
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="1400" [nzVisible]="log.show" nzTitle="充值详情" (nzOnClose)="log.show = false">
+    <section class="drawer-box">
+      <p class="log-tilte">订单状态</p>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="logDetails | keyvalue">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="10%">订单号</th>
+            <th nzWidth="10%">商户</th>
+            <th nzWidth="10%">用户</th>
+            <th nzWidth="10%">渠道</th>
+            <th nzWidth="10%">金额</th>
+            <th nzWidth="10%">IP</th>
+            <th nzWidth="10%">来源</th>
+            <th nzWidth="10%">请求时间</th>
+            <th nzWidth="10%">状态</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr>
+            <td>{{logDetails.order['order_id']}}</td>
+            <td>{{logDetails.order['partner_sign']}}</td>
+            <td>{{logDetails.order['username']}}</td>
+            <td>{{logDetails.order['channel']}}</td>
+            <td>{{logDetails.order['amount']}}</td>
+            <td>{{logDetails.order['client_ip']}}</td>
+            <td>
+              <span *ngIf="logDetails.order['from_device'] == 0">web</span>
+              <span *ngIf="logDetails.order['from_device'] == 1">手机端</span>
+            </td>
+            <td>{{logDetails.order['request_time']}}</td>
+            <td>
+              <span *ngIf="logDetails.order['status'] == 0" style="color: red;">初始化</span>
+              <span *ngIf="logDetails.order['status'] == 1" style="color: red;">代发成功</span>
+              <span *ngIf="logDetails.order['status'] == 2" style="color: red;">回调成功</span>
+              <span *ngIf="logDetails.order['status'] == 3">人工成功</span>
+              <span *ngIf="logDetails.order['status'] == '-1'" style="color: green;">代发失败</span>
+              <span *ngIf="logDetails.order['status'] == '-2'" style="color: green;">回调失败</span>
+              <span *ngIf="logDetails.order['status'] == '-3'" style="color: green;">人工失败</span>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+      <p class="log-tilte">发起充值信息</p>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="logDetails | keyvalue">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="10%">商户号</th>
+            <th nzWidth="8%">金额</th>
+            <th nzWidth="10%">订单号</th>
+            <th nzWidth="8%">来源</th>
+            <th nzWidth="8%">用户</th>
+            <th nzWidth="8%">用户等级</th>
+            <th nzWidth="10%">渠道</th>
+            <th nzWidth="20%">回调地址</th>
+            <th nzWidth="10%">发起IP</th>
+            <th nzWidth="10%">时间</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr>
+            <td>{{logDetails.request_params['merchant_id']}}</td>
+            <td>{{logDetails.request_params['amount']}}</td>
+            <td>{{logDetails.request_params['order_id']}}</td>
+            <td>{{logDetails.request_params['source']}}</td>
+            <td>{{logDetails.request_params['username']}}</td>
+            <td>{{logDetails.request_params['user_level']}}</td>
+            <td>{{logDetails.request_params['channel']}}</td>
+            <td>{{logDetails.request_params['callback_url']}}</td>
+            <td>{{logDetails.request_params['client_ip']}}</td>
+            <td>{{logDetails.request_params['time']}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <p class="log-tilte">发起充值返回信息</p>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="logDetails | keyvalue">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="15%">返回状态</th>
+            <th nzWidth="15%">返回支付订单号</th>
+            <th nzWidth="20%" *ngIf="logDetails.request_back">返回支付地址</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr>
+            <td>
+              <span *ngIf="logDetails.request_back && logDetails.request_back['status'] == 'success'"
+                style="color: green;">成功</span>
+              <span *ngIf="logDetails.request_back && logDetails.request_back['status'] == 'fail'"
+                style="color: red;">失败</span>
+            </td>
+            <td>{{logDetails.request_back ? logDetails.request_back.data['pay_order_id'] : ''}}</td>
+            <td *ngIf="logDetails.request_back">{{logDetails.request_back.data['pay_url']}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <p class="log-tilte">回调信息</p>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="logDetails | keyvalue">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="15%">回调状态</th>
+            <th nzWidth="15%">回调IP</th>
+            <th nzWidth="8%">回调原因:</th>
+            <th nzWidth="15%">回调时间</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr>
+            <td>
+              <span *ngIf="logDetails['back_status'] === '-2'" style="color: red;">回调失败</span>
+              <span *ngIf="logDetails['back_status'] === '2'" style="color: green;">回调成功</span>
+            </td>
+            <td>{{logDetails.back_ip}}</td>
+            <td>{{logDetails.back_reason}}</td>
+            <td>{{utils.formatTime(logDetails.back_time)}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">处理人:</span>
+        <span style="color: red;">{{logDetails.order['partner_admin_id']}}</span>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">处理时间:</span>
+        <span style="color: red;">{{logDetails.order['day_m']}}</span>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">人工操作:</span>
+        <span *ngIf="logDetails.order['status'] === -3" style="color: red;">人工失败</span>
+        <span *ngIf="logDetails.order['status'] === 3" style="color: green;">人工成功</span>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">处理结果:</span>
+        <span *ngIf="logDetails.order['status'] < 0" style="color: red;">失败</span>
+        <span *ngIf="logDetails.order['status'] === 2 || logDetails.order['status'] === 3"
+          style="color: green;">成功</span>
+      </section>
+    </section>
+  </nz-drawer>
+
+  <!-- 人工充值 -->
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="1400" [nzVisible]="handData.show" nzTitle="人工充值"
+    (nzOnClose)="handData.show = false">
+
+    <section class="drawer-box">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="handData.details | keyvalue">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="10%">用户名</th>
+            <th nzWidth="10%">订单号</th>
+            <th nzWidth="10%">金额</th>
+            <th nzWidth="8%">实际上分</th>
+            <th nzWidth="10%">附言</th>
+            <th nzWidth="8%">来源</th>
+            <th nzWidth="10%">IP</th>
+            <th nzWidth="10%">提交时间</th>
+            <th nzWidth="10%">回调时间</th>
+            <th nzWidth="6%">管理员</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr>
+            <td>{{handData.details.nickname}}</td>
+            <td>{{handData.details.order_id}}</td>
+            <td>{{utils.computeMoney(handData.details.amount, 10000)}}</td>
+            <td>{{utils.computeMoney(handData.details.real_amount, 10000)}}</td>
+            <td>{{handData.details.sign}}</td>
+            <td>{{handData.details.source}}</td>
+            <td>{{handData.details.client_ip}}</td>
+            <td>{{utils.formatTime(handData.details.init_time)}}</td>
+            <td>{{utils.formatTime(handData.details.callback_time)}}</td>
+            <td>{{handData.details.admin_id}}</td>
+            <td>
+              <ng-container *ngIf='handData.details.status === -1'>
+                请求失败
+              </ng-container>
+              <ng-container *ngIf='handData.details.status === -2'>
+                回调失败
+              </ng-container>
+              <ng-container *ngIf='handData.details.status === -3'>
+                人工失败
+              </ng-container>
+              <ng-container *ngIf='handData.details.status === 0'>
+                初始化
+              </ng-container>
+              <ng-container *ngIf='handData.details.status === 1'>
+                充值中
+              </ng-container>
+              <ng-container *ngIf='handData.details.status === 2'>
+                充值成功
+              </ng-container>
+              <ng-container *ngIf='handData.details.status === 3'>
+                人工成功
+              </ng-container>
+            </td>
+            <!-- <td>{{utils.computeMoney(logDetails.request_params.amount, 10000)}}</td> -->
+            <!-- <td>{{utils.formatTime(logDetails.request_params.time)}}</td> -->
+          </tr>
+        </tbody>
+      </nz-table>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">类型:</span>
+        <nz-select class="tpl-input" [(ngModel)]="handData.data.type" [nzPlaceHolder]="handData.data.type">
+          <nz-option *ngFor="let option of handData.type_options | keyvalue" [nzValue]="option.key"
+            [nzLabel]="option.value">
+          </nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">金额:</span>
+        <section class="tpl-input">
+          {{handData.data.amount}}
+        </section>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">原因:</span>
+        <input nz-input placeholder="请输入原因" class="tpl-input" [(ngModel)]="handData.data.reason" />
+      </section>
+      <button nz-button nzType="primary" (click)="submitHand()" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+</nz-content>
+
+<nz-modal [(nzVisible)]="exportPop.show" nzTitle="导出" (nzOnCancel)="exportPop.show = false" [nzOkText]="null"
+  [nzCancelText]="null">
+  <ng-container *ngIf="!exportPop.loading; else elseTemplate">
+    <section class="export-content">
+      <button nz-button nzType="primary" nzSize="large" style="width: 47.5rem" (click)="exportAllPage()"><i nz-icon
+          nzType="download"></i>Download</button>
+    </section>
+  </ng-container>
+  <ng-template #elseTemplate>
+    <section class="export-content">
+      <button nz-button nzType="primary" nzSize="large" style="width: 47.5rem" (click)="stopDownload()"><i nz-icon
+          [nzType]="'sync'" [nzSpin]="true"></i>停止下载</button>
+    </section>
+  </ng-template>
+</nz-modal>

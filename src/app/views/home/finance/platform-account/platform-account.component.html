@@ -1,0 +1,117 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzSize="small" nzType="primary" (click)="addHandler()" nzSize="small">添加账户</button>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper #nzTable [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>ID</th>
+            <th>支付厂商</th>
+            <th>商家代码</th>
+            <th>商家密钥</th>
+            <!-- <th>网关</th> -->
+            <th>APP ID</th>
+            <!-- <th>第三方域名</th> -->
+            <th>状态</th>
+            <th>创建时间</th>
+            <!-- <th>更新时间</th> -->
+            <th nzWidth="20%">操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-data [ngForOf]="tableList">
+            <tr (click)="lockTd($event)">
+              <td>{{data.id}}</td>
+              <td>{{data.platform_name}}</td>
+              <td>{{data.merchant_code}}</td>
+              <td>
+                <p class="text-content">
+                  {{data.merchant_secret}}
+                </p>
+              </td>
+              <!-- <td>
+                <p class="text-content">
+                  {{data.gateway}}
+                </p>
+              </td> -->
+              <td>{{data.app_id}}</td>
+              <!-- <td>{{data.platform_domain_url}}</td> -->
+              <td>
+                <nz-switch [ngModel]="data.status" nzCheckedChildren="开" nzUnCheckedChildren="关"
+                  (ngModelChange)="changeStatus(data)"></nz-switch>
+              </td>
+              <td>{{data.created_at}}</td>
+              <!-- <td>{{data.updated_at}}</td> -->
+              <td>
+                <a href="javascript:;" class="a-link" (click)="editHandler(data)">编辑</a>
+                <a href="javascript:;" class="a-link" (click)="deleteHandler(data)">删除</a>
+                <p>
+                  <a class="a-link" *ngIf="data.is_pull" (click)="updateRechargeChannel(data)">更新充值渠道</a>
+                </p>
+                <p>
+                  <a class="a-link" *ngIf="data.is_pull" (click)="updatePaymentChannel(data)">更新代付渠道</a>
+                </p>
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+
+  <!-- 添加编辑 -->
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="720" [nzVisible]="edit.show" nzTitle="编辑/添加" (nzOnClose)="edit.show = false">
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">支付厂商:</span>
+        <nz-select class="tpl-input" [(ngModel)]="edit.data['platform_sign']" nzAllowClear>
+          <nz-option *ngFor="let option of PlatformOptnios" [nzValue]="option.platform_sign"
+            [nzLabel]="option.platform_name">
+          </nz-option>
+        </nz-select>
+      </section>
+      <!-- <section class="tpl-list flexa">
+        <span class="tpl-title">第三方域名:</span> <input nz-input [(ngModel)]="edit.data['platform_domain_url']"
+          placeholder="请输入" class="tpl-input" />
+      </section> -->
+      <section class="tpl-list flexa">
+        <span class="tpl-title">商户号:</span> <input nz-input [(ngModel)]="edit.data['merchant_code']"
+          placeholder="请输入" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">商户秘钥:</span> <input nz-input [(ngModel)]="edit.data['merchant_secret']"
+          placeholder="请输入" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">第三方公钥:</span> <input nz-input [(ngModel)]="edit.data['public_key']"
+          placeholder="请输入" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">第三方私钥:</span> <input nz-input [(ngModel)]="edit.data['private_key']"
+          placeholder="请输入" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">第三方终端号:</span> <input nz-input [(ngModel)]="edit.data['app_id']" placeholder="请输入"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">状态:</span>
+        <nz-switch [(ngModel)]="edit.data['status']" nzCheckedChildren="启用" nzUnCheckedChildren="禁用"></nz-switch>
+      </section>
+      <button nz-button nzType="primary" (click)="submitHandler()" [nzLoading]="edit.loading" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+</nz-content>
+
+<!-- <nz-modal [(nzVisible)]="contentPop.show" [nzCancelText]="null" [nzOkText]="null" nzTitle="内容提示"
+  (nzOnCancel)="contentPop.show = false">
+  <section class="fw content">
+    {{contentPop.data}}
+  </section>
+</nz-modal> -->

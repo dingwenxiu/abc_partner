@@ -1,0 +1,133 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <section class="select-lottery serach-tpl">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">用户名:</span>
+          <input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData['username']"
+            class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">银行卡号:</span>
+          <input nz-input nzSize="small" style="width: 200px;" placeholder="银行卡号"
+            [(ngModel)]="searchData['card_number']" class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">持卡人:</span>
+          <input nz-input nzSize="small" style="width: 200px;" placeholder="持卡人姓名"
+            [(ngModel)]="searchData['owner_name']" class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">支行:</span>
+          <input nz-input nzSize="small" style="width: 200px;" placeholder="支行" [(ngModel)]="searchData['branch']"
+            class="tpl-input" />&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">开户行:</span>
+          <nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['bank_name']" nzAllowClear
+            nzPlaceHolder="开户行选项" class="tpl-input">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option *ngFor="let item of bankSignOption" [nzValue]="item.label" [nzLabel]="item.label"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">状态:</span>
+          <nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['status']" nzAllowClear
+            nzPlaceHolder="状态选项" class="tpl-input">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option [nzValue]="'1'" [nzLabel]="'开启'"></nz-option>
+            <nz-option [nzValue]="'0'" [nzLabel]="'禁用'"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="search()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="resetSearch()"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" #fixedTable [nzData]="[{}]">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">ID</th>
+            <th nzWidth="10%">用户名</th>
+            <th nzWidth="8%">开户行</th>
+            <th nzWidth="15%">卡号</th>
+            <th nzWidth="9%">持卡人</th>
+            <th nzWidth="9%">支行</th>
+            <th nzWidth="5%">地区</th>
+            <th nzWidth="10%">上次更新</th>
+            <th nzWidth="4%">状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.bank_name}}</td>
+            <td>{{item.card_number}}</td>
+            <td>{{item.owner_name}}</td>
+            <td>{{item.branch}}</td>
+            <td>{{item.area}}</td>
+            <td>{{item.update_time}}</td>
+            <td>
+              <ng-container *ngIf="item.status; else elseTemplate">
+                <i class="fa fa-check txt-color-green"></i>
+              </ng-container>
+              <ng-template #elseTemplate>
+                <i class="fa fa-times txt-color-red"></i>
+              </ng-template>
+            </td>
+            <td>
+              <ng-container *ngIf="item.status">
+                <a href="javascript:;" class="a-link" (click)="getEdit(item)">编辑</a>&nbsp;
+                <a href="javascript:;" class="a-link" (click)="doStatus(item)">删除</a>
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]="searchData['page_size']" [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>
+<!-- 添加银行卡 --->
+<nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }" [nzWidth]="720"
+  [nzVisible]="edit.show" [nzTitle]="edit.type === 0 ? '添加银行卡' : '编辑' " (nzOnClose)="edit.show = false">
+  <section class="tpl-lists">
+    <section class="tpl-list flexa">
+      <span class="tpl-title">银行:</span>
+      <nz-select style="width: 173px;" [(ngModel)]="edit.data.bank_sign" nzPlaceHolder="请选择" nzAllowClear>
+        <nz-option *ngFor="let option of edit.bank_options" [nzValue]="option.key" [nzLabel]="option.value">
+        </nz-option>
+      </nz-select>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">省份:</span>
+      <nz-cascader [nzOptions]="edit.province_options" [(ngModel)]="provinceSelected"
+        (ngModelChange)="onProvinceChanges($event)"> </nz-cascader>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">持卡人:</span> <input required nz-input [(ngModel)]="edit.data.owner_name"
+        placeholder="请输入持卡人" class="tpl-input" />
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">卡号:</span> <input nz-input [(ngModel)]="edit.data.card_number" placeholder="请输入卡号"
+        class="tpl-input" />
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">支行:</span> <input nz-input [(ngModel)]="edit.data.branch" placeholder="请输入支行"
+        class="tpl-input" />
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">资金密码:</span> <input nz-input type="password" [(ngModel)]="edit.data.fund_password"
+        placeholder="请输入资金密码" class="tpl-input" />
+    </section>
+    <button nz-button nzType="primary" (click)="submitAddFrom()" [nzLoading]="tplModalButtonLoading" class="submit">
+      提交
+    </button>
+  </section>
+</nz-drawer>

@@ -1,0 +1,39 @@
+@import '../../style.css';
+
+.select-lottery{
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.tpl-title{
+  width: 75px;
+}
+
+.tpl-list{
+  width: 290px;
+}
+.tpl-list-time{
+  width: 600px;
+}
+
+.tpl-input{
+  width: 200px;
+}
+
+.avatarImg{ 
+  border: 1px solid #000000;
+  max-height: 100px;
+  max-width: 100px;
+  overflow: hidden;
+  border-radius: 150px;
+}
+
+.img-box{
+  display: flex;
+  flex-flow: column nowrap;
+  margin: 10px;
+}
+
+::ng-deep .tpl-list .ant-upload-list{
+  display: none;
+}

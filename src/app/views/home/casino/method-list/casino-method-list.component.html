@@ -1,0 +1,107 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <input nz-input placeholder="游戏名称" nzSize="small" [(ngModel)]="searchData.cn_name" class="select-lottery-input search-child"/>
+      <nz-select style="width: 150px;" nzSize="small" nzPlaceHolder="每页显示数量" [(ngModel)]="searchData.page_size" nzAllowClear class="search-child">
+        <nz-option nzLabel="每页8条" nzValue="8"></nz-option>
+        <nz-option nzLabel="每页16条" nzValue="16"></nz-option>
+        <nz-option nzLabel="每页20条" nzValue="20"></nz-option>
+        <nz-option nzLabel="每页24条" nzValue="24"></nz-option>
+      </nz-select>
+      <nz-select style="width: 150px;" nzSize="small" [(ngModel)]="searchData.main_game_plat_code" nzAllowClear nzPlaceHolder="游戏平台" class="search-child">
+        <nz-option nzLabel="全部" nzValue=""></nz-option>
+        <nz-option *ngFor="let item of optionsData.plat_form" [nzLabel]="item.name" [nzValue]="item.code"></nz-option>
+      </nz-select>
+      <nz-select style="width: 150px;" nzSize="small" [(ngModel)]="searchData.category" nzAllowClear nzPlaceHolder="游戏类型" class="search-child">
+        <nz-option nzLabel="全部" nzValue=""></nz-option>
+        <nz-option *ngFor="let item of optionsData.categories" [nzLabel]="item.name" [nzValue]="item.code"></nz-option>
+      </nz-select>
+      <button nz-button nzType="primary" nzSize="small" class="select-search" (click)="getDataList()"><i nz-icon type="search" class="search-child"></i>搜索</button>
+      <button nz-button nzType="primary" nzSize="small" class="select-reset" (click)="getDataList(true)"><i nz-icon type="sync" class="search-child"></i>重置</button>
+      <button nz-button nzType="primary" nzSize="small" (click)="SynchronousData()" [disabled]="timeCoulDown"><i nz-icon type="sync"></i>数据同步</button>
+    </section>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" #BaseData [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>ID</th>
+            <th>中文</th>
+            <th>英文名</th>
+            <th>类别</th>
+            <th>类型</th>
+            <th>状态</th>
+            <th>创建时间</th>
+            <th>游戏平台</th>
+            <!-- <th>自定义图片</th> -->
+            <th nzWidth="13%">游戏图片</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList;let i = index;">
+            <td>{{item.id}}</td>
+            <td>{{item.cn_name}}</td>
+            <td>{{item.en_name}}</td>
+            <td>{{item.category}}</td>
+            <td>{{item.type}}</td>
+            <td>
+              <nz-switch [(ngModel)]="item.status" (ngModelChange)="setGameStatus($event, item.id, i)" nzCheckedChildren="启用" nzUnCheckedChildren="禁用" class="switch"></nz-switch>
+            </td>
+            <td>{{item.created_at}}</td>
+            <td>{{item.main_game_plat_code}}</td>
+            <!-- <td> 
+              <span *ngIf="!(item.ad_img || item.img)"></span>
+              <img *ngIf="(item.ad_img || item.img)" [src]="(item.img.includes('http') ? '' : api.imgUrl) + (item.ad_img || item.img)" style="width: 55px; height: 55px; padding: 3px;margin-right: 10px;" />
+            </td> -->
+            <td>
+              <div class="game">
+                <!-- <ng-container *ngIf="!item.img || imgBool[i]; else elseTemplate"> -->
+                  <nz-upload
+                  [nzAction]="api.domain + '/partner-api/casino/casinoGameImgUpload'"
+                  [nzData] = "{platforms: item.main_game_plat_code, method_id: item.id}"
+                  (nzChange) = 'upImage($event, i)'
+                  class="upload"
+                  >
+                    <button nz-button nzSize="small"><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+                  </nz-upload>
+                <!-- </ng-container>
+                <ng-template #elseTemplate> -->
+                  <img *ngIf="item.img" class="img" [src]="item.img.includes('http') ? item.img : api.imgUrl + item.img" style="width: 55px;height: 55px;margin:auto;"/>
+                  <nz-upload
+                  *ngIf="!item.img"
+                  class="img"
+                  [nzAction]="api.domain + '/partner-api/casino/casinoGameImgUpload'"
+                  [nzData] = "{platforms: item.main_game_plat_code, method_id: item.id}"
+                  (nzChange) = 'upImage($event, i)'
+                  >
+                    <button nz-button nzSize="small"><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+                  </nz-upload>
+                  <!-- <span class="img" [ngStyle]="{'background-image': 'url(' + item.img + ')'}"></span> -->
+                <!-- </ng-template> -->
+              </div>
+            </td>
+            <td>
+              <button nz-button nzType="primary" (click)="detail(item)" nzSize="small">详情</button>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<nz-modal 
+nzTitle = "详情"
+[nzCancelText]="null"
+[nzOkText]="null"
+nzWidth="100rem"
+[nzVisible] = "detailPop.show"
+(nzOnCancel) = "detailPop.show = false">
+  <section class="tpl-lists">
+    <nz-descriptions nzBordered>
+      <nz-descriptions-item *ngFor="let item of detailPop.data | keyValueDel" [nzTitle]="item[0]">{{item[1]}}</nz-descriptions-item>
+    </nz-descriptions>
+  </section>
+</nz-modal>

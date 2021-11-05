@@ -1,0 +1,110 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzSize="small" nzType="primary" (click)="addHandler()" nzSize="small">添加账户</button>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper #nzTable [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>ID</th>
+            <th>银行代码</th>
+            <th>通道名称</th>
+            <th>通道标记</th>
+            <th>方向</th>
+            <th>网关</th>
+            <th>第三方标记</th>
+            <th>返回模式</th>
+            <th>类型标记</th>
+            <th>状态</th>
+            <th>创建时间</th>
+            <th>更新时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+        <ng-template ngFor let-data [ngForOf]="tableList">
+          <tr>
+            <td>{{data.id}}</td>
+            <td>{{data.banks_code}}</td>
+            <td>{{data.channel_name}}</td>
+            <td>{{data.channel_sign}}</td>
+            <td>{{data.direction}}</td>
+            <td>{{data.gateway}}</td>
+            <td>{{data.platform_sign}}</td>
+            <td>{{data.request_mode}}</td>
+            <td>{{data.type_sign}}</td>
+            <td>
+              <nz-switch [ngModel]="data.status" nzCheckedChildren="上架" nzUnCheckedChildren="下架" (ngModelChange)="changeStatus(data)"></nz-switch>
+            </td>
+            <td>{{data.created_at}}</td>
+            <td>{{data.updated_at}}</td>
+            <td>
+              <a href="javascript:;" class="a-link" (click)="editHandler(data)">编辑</a>
+              <a href="javascript:;" class="a-link" (click)="deleteHandler(data)">删除</a>
+            </td>
+          </tr>
+        </ng-template>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+      (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+    
+    
+  <!-- 添加编辑 -->
+  <nz-drawer
+  [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+  [nzMaskClosable]="false"
+  [nzWidth]="720"
+  [nzVisible]="edit.show"
+  nzTitle="编辑/添加"
+  (nzOnClose)="edit.show = false"
+  >
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">支付厂商:</span>
+        <nz-select style="width: 173px;" [(ngModel)]="edit.data['platform_sign']" nzAllowClear>
+            <nz-option *ngFor="let option of PlatformOptnios" [nzValue]="option.platform_sign" [nzLabel]="option.platform_name">
+            </nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">支付类型:</span>
+        <nz-select style="width: 173px;" [(ngModel)]="edit.data['type_sign']" nzAllowClear>
+            <nz-option *ngFor="let option of ChannelTypeOptions" [nzValue]="option.type_sign" [nzLabel]="option.type_name">
+            </nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">支付方式名称:</span> <input nz-input  [(ngModel)]="edit.data['channel_name']" placeholder="请输入" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">支付方式标记:</span> <input nz-input  [(ngModel)]="edit.data['channel_sign']" placeholder="请输入" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">支付方式请求地址:</span> <input nz-input  [(ngModel)]="edit.data['gateway']" placeholder="请输入" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">支付的请求方式:</span>
+        <nz-radio-group [(ngModel)]="edit.data['request_mode']" [nzButtonStyle]="'solid'">
+          <label nz-radio-button nzValue="0">jump</label>
+          <label nz-radio-button nzValue="1">json</label>
+        </nz-radio-group>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">金流的方向:</span>
+        <nz-radio-group [(ngModel)]="edit.data['direction']" [nzButtonStyle]="'solid'">
+          <label nz-radio-button nzValue="0">入款</label>
+          <label nz-radio-button nzValue="1">出款</label>
+        </nz-radio-group>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">状态:</span>
+        <nz-switch [(ngModel)]="edit.data['status']" nzCheckedChildren="上架" nzUnCheckedChildren="下架"></nz-switch>
+      </section>
+      <button nz-button nzType="primary" (click)="submitHandler()" [nzLoading]="edit.loading" class="submit">
+        提交
+      </button>
+      </section>
+    </nz-drawer>
+  </nz-content>

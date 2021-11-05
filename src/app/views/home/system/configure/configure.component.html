@@ -1,0 +1,123 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <!-- <button nz-button nzType="primary" (click)="addConfigure({})" nzSize="small">添加配置</button> -->
+    <button nz-button class="top-button" nzType="primary" (click)="doFlush()" nzSize="small">刷新缓存</button>
+    <section class="main-content">
+      <nz-table nzShowQuickJumper #nzTable [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzShowExpand>操作</th>
+            <th>标识</th>
+            <th>名称</th>
+            <th>值</th>
+            <th>描述</th>
+            <th>添加人ID</th>
+            <th nzWidth="7%">更新人ID</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-data [ngForOf]="tableList">
+            <tr *ngIf="data.can_show">
+              <td nzShowExpand [(nzExpand)]="mapOfExpandData[data.id]"></td>
+              <td>{{data.sign}}</td>
+              <td>{{data.name}}</td>
+              <td>{{data.value}}</td>
+              <td>{{data.description}}</td>
+              <td>{{data.add_partner_admin_id}}</td>
+              <td>{{data.update_partner_admin_id}}</td>
+              <td>
+                <span *ngIf="data.status" style="color: green;">启用</span>
+                <span *ngIf="!data.status" style="color: red;">禁用</span>
+              </td>
+              <td>
+                <button *ngIf="data.can_edit" class="config-btn" nz-button nzType="primary" (click)="addConfigure(data)" nzSize="small"
+                  >编辑</button>
+                <nz-switch [(ngModel)]="data.status" [nzControl]='true' (click)="doStatus(data.id)"
+                  nzCheckedChildren="开" nzUnCheckedChildren="关" [class]="data.can_edit ? 'switch' : 'switch ml'"></nz-switch>
+              </td>
+            </tr>
+            <tr [nzExpand]="mapOfExpandData[data.id]">
+              <td colspan="17" class="expand">
+                <nz-table #innerTable [nzData]="data.child" nzSize="middle" [nzShowPagination]="false" [nzPageSize]="'999'" class="child-table">
+                  <thead class="ant-table-thead">
+                    <tr>
+                      <th>标识</th>
+                      <th>名称</th>
+                      <th>值</th>
+                      <th>描述</th>
+                      <th>添加人</th>
+                      <th nzWidth="7%">更新人ID</th>
+                      <th>状态</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                <tbody class="ant-table-thead">
+                  <ng-template ngFor let-item [ngForOf]="innerTable.data">
+                    <tr *ngIf="item.can_show">
+                      <td>{{item.sign}}</td>
+                      <td>{{item.name}}</td>
+                      <td>{{item.value}}</td>
+                      <td>{{item.description}}</td>
+                      <td>{{item.add_partner_admin_id}}</td>
+                      <td>{{item.update_partner_admin_id}}</td>
+                      <td>
+                        <span *ngIf="item.status" style="color: green;">启用</span>
+                        <span *ngIf="!item.status" style="color: red;">禁用</span>
+                      </td>
+                      <td>
+                        <button *ngIf="item.can_edit" class="config-btn" nz-button nzType="primary" (click)="addConfigure(item)" nzSize="small" >编辑</button>
+                        <nz-switch [(ngModel)]="item.status" [nzControl]='true' (click)="doStatus(item.id)" nzCheckedChildren="开"
+                          nzUnCheckedChildren="关" class="switch"></nz-switch>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </tbody>
+              </nz-table>
+            </td>
+      </tr>
+      </ng-template>
+      </tbody>
+      </nz-table>
+    </section>
+  </section>
+
+  <nz-drawer [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false" [nzWidth]="720" [nzVisible]="edit.show" nzTitle="编辑/添加" (nzOnClose)="back()">
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">名称:</span> <input required nz-input [(ngModel)]="edit.data['name']" placeholder="请输入名称"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">标识:</span> <input nz-input [(ngModel)]="edit.data['sign']" placeholder="请输入标识"
+          class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">值:</span>
+        <ng-container *ngIf="edit.data['sign'] !== 'player_default_type';else setTypeTmp">
+          <input nz-input [(ngModel)]="edit.data['value']" placeholder="请输入值"
+            class="tpl-input" />
+        </ng-container>
+        <ng-template #setTypeTmp>
+          <nz-radio-group [(ngModel)]="edit.data['value']" [nzSize]="'small'" [nzButtonStyle]="'solid'">
+            <label nz-radio-button nzValue="2">代理</label>
+            <label nz-radio-button nzValue="3">会员</label>
+          </nz-radio-group>
+        </ng-template>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">开启状态:</span>
+        <nz-switch [(ngModel)]="edit.data['status']" nzCheckedChildren="开启" nzUnCheckedChildren="禁用"></nz-switch>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">描述:</span> <input nz-input [(ngModel)]="edit.data['description']" placeholder="请输入描述"
+          class="tpl-input" />
+      </section>
+      <button nz-button nzType="primary" (click)="submitEdit()"  class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+</nz-content>

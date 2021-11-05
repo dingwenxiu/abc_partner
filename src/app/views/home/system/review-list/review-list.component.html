@@ -1,0 +1,151 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <section class="select-lottery serach-tpl">
+        <section class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">审核类型:</span>
+          <nz-select [(ngModel)]="reviewType" (ngModelChange)="typeChange($event)" nzAllowClear nzPlaceHolder="请选择审核类型" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option nzValue="system_transfer_add" nzLabel="玩家理赔"></nz-option>
+            <nz-option nzValue="system_transfer_reduce" nzLabel="玩家扣减"></nz-option>
+            <nz-option nzValue="fund_password" nzLabel="资金密码"></nz-option>
+            <nz-option nzValue="password" nzLabel="登录密码"></nz-option>
+            <nz-option nzValue="frozen" nzLabel="玩家解冻"></nz-option>
+            <nz-option nzValue="frozenAll" nzLabel="玩家解冻(包含下级)"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section *ngIf="frozenSelect.includes(searchData['type'])" class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">冻结类型:</span>
+          <nz-select [(ngModel)]="searchData['type_detail']" nzAllowClear nzPlaceHolder="请选择冻结" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option nzValue="1" nzLabel="禁止登录"></nz-option>
+            <nz-option nzValue="2" nzLabel="禁止投注"></nz-option>
+            <nz-option nzValue="3" nzLabel="禁止提现"></nz-option>
+            <nz-option nzValue="4" nzLabel="禁止转账"></nz-option>
+            <nz-option nzValue="5" nzLabel="禁止资金"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section *ngIf="searchData['type'] === 'system_transfer_add'" class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">理赔类型:</span>
+          <nz-select [(ngModel)]="searchData['type_detail']" nzAllowClear nzPlaceHolder="请选择冻结" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option nzValue="1" nzLabel="普通理赔"></nz-option>
+            <nz-option nzValue="2" nzLabel="分红理赔"></nz-option>
+            <nz-option nzValue="3" nzLabel="充值理赔"></nz-option>
+            <nz-option nzValue="4" nzLabel="红包理赔"></nz-option>
+            <nz-option nzValue="5" nzLabel="活动礼金"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section *ngIf="searchData['type'] === 'system_transfer_reduce'" class="tpl-list flexa">
+          <span class="tpl-title tpl-title-search">扣减类型:</span>
+          <nz-select [(ngModel)]="searchData['type_detail']" nzAllowClear nzPlaceHolder="请选择冻结" class="tpl-input"
+            nzSize="small">
+            <nz-option nzValue="" nzLabel="全部"></nz-option>
+            <nz-option nzValue="1" nzLabel="系统扣减"></nz-option>
+            <nz-option nzValue="2" nzLabel="充值错误扣减"></nz-option>
+            <nz-option nzValue="3" nzLabel="礼金错误扣减"></nz-option>
+            <nz-option nzValue="4" nzLabel="奖金错误扣减"></nz-option>
+            <nz-option nzValue="5" nzLabel="提现扣减"></nz-option>
+          </nz-select>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <button nz-button nzType="primary" class="select-search" (click)="search()" nzSize="small"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzType="primary" class="select-reset" (click)="resetSearch()" nzSize="small"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="[{}]">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>用户名</th>
+            <th>金额</th>
+            <th>提交人</th>
+            <th>申请备注</th>
+            <th>审核人</th>
+            <th>审核类型</th>
+            <th>审核IP</th>
+            <th>申请人</th>
+            <th>申请IP</th>
+            <th>申请时间</th>
+            <!-- <th>审核时间</th> -->
+            <th>审核备注</th>
+            <th>失败备注</th>
+            <th>状态</th>
+            <th nzWidth="12%">操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-item [ngForOf]="tableList">
+            <tr>
+              <td>{{item.player_username}}</td>
+              <td>{{item.process_amount}}</td>
+              <td>{{item.request_admin_name}}</td>
+              <td>{{item.desc}}</td>
+              <td>{{item.review_admin_name}}</td>
+              <td>
+                {{typeDetail[item.type].detail[item.type_detail] || typeDetail[item.type].name}}
+              </td>
+              <td>{{item.review_ip}}</td>
+              <td>{{item.request_admin_name}}</td>
+              <td>{{item.request_ip}}</td>
+              <td>{{item.request_time}}</td>
+              <td>{{item.process_desc}}</td>
+              <td>{{item.review_fail_reason}}</td>
+              <td>
+                <span *ngIf="item.status == 0">待审核</span>
+                <span *ngIf="item.status == 1" style="color: green;">审核中</span>
+                <span *ngIf="item.status == 2" style="color: green;">审核成功</span>
+                <span *ngIf="item.status == -2" style="color: red;">人工失败</span>
+                <span *ngIf="item.status == -3" style="color: red;">条件失败</span>
+              </td>
+              <td>
+                <ng-container *ngIf="![item.handle_admin_one, item.handle_admin_two, item.handle_admin_three].includes(userName) && (item.status === 0 || +item.status === 1); else statusTemp">                        
+                  <button nz-button nzType="primary" (click)="processEnter(item.id, 'allow')" nzSize="small">通过</button>
+                  <button nz-button nzType="primary" (click)="processEnter(item.id, 'no')" nzSize="small">拒绝</button>
+                </ng-container>
+                <ng-template #statusTemp>
+                  
+                </ng-template>
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<nz-modal 
+nzTitle = "详情"
+[nzCancelText]="null"
+[nzOkText]="null"
+nzWidth="100rem"
+[nzVisible] = "detailPop.show"
+(nzOnCancel) = "detailPop.show = false">
+  <section class="tpl-lists">
+    <nz-descriptions nzBordered [nzColumn]="{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }">
+      <nz-descriptions-item *ngFor="let item of detailPop.data | keyValueDel" [nzTitle]="item[0]">{{item[1]}}</nz-descriptions-item>
+    </nz-descriptions>
+  </section>
+</nz-modal>
+
+<nz-modal [(nzVisible)]="processPop.show" nzTitle="输入资金密码" (nzOnCancel)="processPop.show = false" (nzOnOk)="process()">
+  <section class="tpl-list flexa" *ngIf="processPop.type === 'allow'">
+    <span class="tpl-title">备注:</span>
+    <input nz-input [(ngModel)]="processPop.data['process_desc']" placeholder="请输入备注" class="tpl-input" />
+  </section>
+  <section class="tpl-list flexa" *ngIf="processPop.type === 'no'">
+    <span class="tpl-title">拒绝原因:</span>
+    <input nz-input [(ngModel)]="processPop.data['review_fail_reason']" placeholder="请输入备注" class="tpl-input" />
+  </section>
+  <section class="tpl-list flexa">
+    <span class="tpl-title">验证资金密码:</span>
+    <input type="password" nz-input [(ngModel)]="processPop.data.fund_password" placeholder="请输入密码" class="tpl-input" />
+  </section>
+</nz-modal>

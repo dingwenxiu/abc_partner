@@ -1,0 +1,48 @@
+@import '../../style.css';
+.changePass-box{
+  height:45px;
+  line-height:45px;
+  border-bottom:1px solid #E8E8E8;
+  margin-bottom: 28px;
+}
+.changePass{
+  padding:0 30px;
+  float: left;
+  height:44px;
+  cursor: pointer;
+}
+.changePass.active{
+  border-bottom:2px solid #2596FE;
+  box-sizing: border-box;
+  color:#2596FE;
+}
+
+.ant-table-wrapper{
+  margin-top:15px;
+}
+
+.tpl-title{
+  width: 75px;
+}
+
+.tpl-list{
+  width: 290px;
+}
+
+.log-tilte{
+  font-size: 1.5rem;
+  color: brown;
+}
+
+
+.tpl-input{
+  width: 200px;
+}
+.tpl-list-time{
+  width: 475px;
+}
+
+.refresh{
+  width: 190px;
+  float: right;
+}

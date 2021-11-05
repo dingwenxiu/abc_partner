@@ -1,0 +1,38 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <section style="padding-bottom:12px;">
+        <button nz-button nzType="primary" nzSize="small" (click)="SynchronousData()" [disabled]="timeCoulDown"><i nz-icon type="sync"></i>数据同步</button>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+        <tr>
+          <th>代码</th>
+          <th>平台名称</th>
+          <th>图片</th>
+        </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+        <tr *ngFor="let item of tableList;let i = index;">
+          <td>{{item.code}}</td>
+          <td>{{item.name}}</td>
+          <td *ngIf="!item.image">
+            <nz-upload
+            [nzAction]="api.domain + '/partner-api/casino/uploadImage'"
+            [nzData] = "{platforms: item.code}"
+            (nzChange) = 'upImage($event)'
+            >
+              <button nz-button nzSize="small"><i nz-icon nzType="upload"></i><span>上传图片</span></button>
+            </nz-upload>
+          </td>
+          <td *ngIf="item.image">
+            <img [src]="api.imgUrl + item.image" style="width: 55px; height: 55px; padding: 3px;margin-right: 10px;" />
+            <i nz-icon nzType="close" nzTheme="outline" class="imgClose" (click)="delete(item, i)"></i>
+          </td>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index" (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>

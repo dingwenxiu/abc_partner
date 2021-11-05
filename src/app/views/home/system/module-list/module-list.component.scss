@@ -1,0 +1,106 @@
+@import '../../style.css';
+
+.share{
+  padding:10px 0;
+}
+.qr-code{
+  margin:0 auto;
+  width:130px;
+  height:130px;
+}
+::ng-deep .ant-checkbox-wrapper + .ant-checkbox-wrapper{
+  margin-left: 0;
+}
+
+:host ::ng-deep .upload-list-inline .ant-upload-list-item {
+  float: left;
+  width: 200px;
+  margin-right: 8px;
+}
+
+.remove-tr{
+  transition: transform 1s;
+  transform: translateX(-2000px);
+}
+
+
+.status-off .ant-tabs-tab{
+  background-color: rgb(190,190,190);
+  color: #fff;
+}
+.img-box{
+  width:200px;
+  height: 150px;
+  text-align: center;
+}
+
+.ant-input-group{
+  width: 75%;
+}
+.ant-input-group-wrapper{
+  width: 64%;
+}
+
+.avatarImg{ 
+  max-height: 150px;
+  max-width: 150px;
+  overflow: hidden;
+  border-radius: 150px;
+}
+
+.upload-list-inline{
+  margin-right: 10px;
+}
+
+.imgClose{
+  position: absolute;
+}
+
+.imgList{
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  width: 200px;
+  height: 180px;
+  margin-right: 10px;
+}
+
+:host ::ng-deep .imgList .ant-btn{
+  width: 200px;
+  margin-bottom: 10px;
+}
+
+.colorControl {
+  width: 100px;
+  height: 24px;
+}
+
+.showColor {
+  width: 100px;
+  height: 24px;
+}
+
+.themeSwitch{
+  transform: translate(75px, 23px);
+}
+
+.imgbg {
+  width: 125px;
+  height: 125px;
+  display: inline-block;
+  background: transparent 
+              no-repeat 
+              scroll 
+              center center / 100%
+              content-box content-box;
+}
+
+:host ::ng-deep .ant-upload-list-item,
+:host ::ng-deep .ant-popover-message{
+  display: none;
+}
+
+:host ::ng-deep .ant-tabs,
+:host ::ng-deep .ant-descriptions-view{
+  overflow: visible;
+}

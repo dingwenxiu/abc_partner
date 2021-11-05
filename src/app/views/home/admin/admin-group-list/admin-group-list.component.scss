@@ -1,0 +1,55 @@
+@import '../../style.css';
+
+// color:#3097D1;
+.admin-title-content-list.on{
+    color:#3097D1;
+    text-decoration: underline;
+}
+.ant-table-row .ant-table-row:nth-last-child(1) td{
+    border-bottom:none;
+}
+
+.tree-lists1,
+.tree-lists2,
+.tree-lists3{
+  margin-top:7px;
+}
+.tree-list {
+  margin-bottom: 30px;
+}
+.tree-list2 {
+  margin-bottom: 10px;
+}
+
+.tree-lists{
+  color: #0abd0a;
+}
+.tree-lists .yes{
+  padding-left:3px;
+  color: green;
+}
+.tree-lists2{
+  margin-left: 25px;
+}
+.tree-lists3{
+  margin-bottom: 10px;
+}
+.tree-lists2 .tree-list2{
+
+}
+.tree-lists3{
+  margin-left: 25px;
+}
+.tree-lists::ng-deep .ant-checkbox{
+  z-index: -1;
+}
+.tree-all::ng-deep .ant-checkbox{
+  z-index: -1;
+}
+.tree-all-box{
+  margin-bottom: 30px;
+}
+.tree-all-box .submit{
+  margin: 0 0 0 40px;
+}
+

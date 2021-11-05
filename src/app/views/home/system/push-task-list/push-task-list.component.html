@@ -1,0 +1,101 @@
+<nz-content style="margin:0 16px;">
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+
+      <section class="header fw">
+        <i class="fa fa-table"></i>
+        推送任务列表
+        <section class="fr fw">
+          <button nz-button nzType="primary" nzSize="small" (click)="addTask(0)">添加推送任务</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        </section>
+
+      </section>
+      <section class="main-content">
+        <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+          <thead class="ant-table-thead">
+            <tr>
+              <th nzWidth="4%">ID</th>
+              <th nzWidth="5%">消息类型</th>
+              <th nzWidth="6%">平台类型</th>
+              <th nzWidth="15%">推送标题</th>
+              <th nzWidth="20%">推送内容</th>
+              <th nzWidth="6%">时间类型</th>
+              <th nzWidth="10%">时间配置</th>
+              <th nzWidth="6%">添加人</th>
+              <th nzWidth="10%">结果</th>
+              <th nzWidth="5%">状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody class="ant-table-tbody">
+            <tr *ngFor="let item of tableList">
+              <td>{{item.id}}</td>
+              <td>{{item.push_msg_type}}</td>
+              <td>{{item.push_device_type}}</td>
+              <td>{{item.title}}</td>
+              <td>{{item.content}}</td>
+              <td>{{item.push_time_type}}</td>
+              <td>{{item.push_time_config}}</td>
+              <td>{{item.admin_id}}</td>
+              <td>{{item.result}}</td>
+              <td>
+                {{item.status}}
+              </td>
+              <td>
+                  <a href="javascript:;" class="a-link" (click)="addTask(item.id)">编辑</a>
+                  <a href="javascript:;" class="a-link" (click)="doDel(item.id)">删除</a>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+        <nz-pagination [nzPageIndex]="1" [nzPageSize]='15' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+          (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+      </section>
+    </section>
+
+  <!-- 添加公告 -->
+  <nz-drawer
+      [nzClosable]="addData.show"
+      [nzVisible]="addData.show"
+      [nzMaskClosable]= 'false'
+      nzWidth = 'auto'
+      nzPlacement="right"
+      nzTitle="添加任务"
+      (nzOnClose)="addData.show = false"
+    >
+    <section class="tpl-lists">
+      <section class="tpl-list flexa" >
+        <span class="tpl-title">公告类型:</span>
+        <nz-select style="width: 173px;" [(ngModel)]="addData.data.push_msg_type" [nzPlaceHolder]="addData.data.push_msg_type" nzAllowClear>
+          <nz-option *ngFor="let option of addData.msg_options | keyvalue" [nzValue]="option.key" [nzLabel]="option.value"></nz-option>
+        </nz-select>
+      </section>
+
+      <section class="tpl-list flexa" >
+        <span class="tpl-title">设备类型:</span>
+        <nz-select style="width: 173px;" [(ngModel)]="addData.data.push_device_type" [nzPlaceHolder]="addData.data.push_device_type" nzAllowClear>
+          <nz-option *ngFor="let option of addData.device_options | keyvalue" [nzValue]="option.key" [nzLabel]="option.value"></nz-option>
+        </nz-select>
+      </section>
+
+      <section class="tpl-list flexa">
+        <span class="tpl-title">标题:</span> <input nz-input  [(ngModel)]="addData.data.title" placeholder="请输入标识" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">内容:</span> <input nz-input [(ngModel)]="addData.data.content" placeholder="请输入值" class="tpl-input" />
+      </section>
+
+      <section class="tpl-list flexa" >
+        <span class="tpl-title">时间类型:</span>
+        <nz-select style="width: 173px;" [(ngModel)]="addData.data.push_time_type" [nzPlaceHolder]="addData.data.push_time_type" nzAllowClear>
+          <nz-option *ngFor="let option of addData.time_options | keyvalue" [nzValue]="option.key" [nzLabel]="option.value"></nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">每日定时配置:</span> <input nz-input [(ngModel)]="addData.data.push_time_config" placeholder="请输入小时,多个用|号隔开" class="tpl-input" />
+      </section>
+      <button nz-button nzType="primary" (click)="submitTask()" [nzLoading]="addData.buttonLoading" class="submit">
+        提交
+      </button>
+    </section>
+    </nz-drawer>
+  </nz-content>

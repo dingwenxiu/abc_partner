@@ -1,0 +1,43 @@
+@import '../../style.css';
+
+.menu-list-content{
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.menu-list{
+    margin-right: 50px;
+}
+
+.menu-list-bg{
+    background-color: #ffffff;
+}
+
+.menus{
+    display: flex;
+    justify-content: space-between;
+    width: 250px;
+    margin-bottom: 15px;
+    padding: 10px;
+    line-height: 2rem;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.menus:hover{
+    background-color: rgba($color: #def1ff, $alpha: 1);
+    color: #1890ff;
+    cursor: pointer;
+}
+
+.menus-hover{
+    background-color: rgba($color: #def1ff, $alpha: 1);
+}
+
+.menus-list{
+    margin-left: 50px;
+}
+
+.menu-label{
+    width: 170px;
+    height: 30px;
+}

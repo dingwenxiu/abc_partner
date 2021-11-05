@@ -1,0 +1,95 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <nz-layout>
+        <nz-layout>
+          <section class="select-lottery serach-tpl">
+            <section class="tpl-list flexa">
+              <span class="tpl-title">游戏:</span>
+              <nz-cascader nzSize="small" [nzOptions]="lotteryOption" [(ngModel)]="defaultSelect"
+                (ngModelChange)="doSelectLottery($event)" class="tpl-input"></nz-cascader>&nbsp;&nbsp;
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">ID:</span>
+              <input nz-input nzSize="small" placeholder="ID" [(ngModel)]="searchData['id']" class="tpl-input" />
+            </section>
+            <section class="tpl-list flexa">
+              <span class="tpl-title">每页条数:</span>
+              <nz-select style="width: 200px;" nzSize="small" [(ngModel)]="searchData['page_size']" nzAllowClear
+                nzPlaceHolder="每页条数" class="tpl-input">
+                <nz-option [nzValue]="'10'" nzLabel="10条"></nz-option>
+                <nz-option [nzValue]="'20'" nzLabel="20条"></nz-option>
+                <nz-option [nzValue]="'30'" nzLabel="30条"></nz-option>
+              </nz-select>
+            </section>
+            <section class="tpl-list flexa tpl-list-time" style="width: 500px;">
+              <span class="tpl-title">时间:</span>
+              <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)"
+                 (click)="timeHandle()" nzShowTime></nz-range-picker>&nbsp;&nbsp;
+            </section>
+            <section class="tpl-list flexa">
+              <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="search()"><i nz-icon
+                  type="search"></i>搜索</button>&nbsp;&nbsp;
+              <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon
+                  type="sync"></i>重置</button>
+            </section>
+          </section>
+        </nz-layout>
+      </nz-layout>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="4%">追号ID</th>
+            <th nzWidth="6%">用户名</th>
+            <th nzWidth="6%">彩种</th>
+            <th nzWidth="8%">玩法</th>
+            <th nzWidth="6%">开始奖期</th>
+            <th nzWidth="6%">当前奖期</th>
+            <th nzWidth="6%">结束奖期</th>
+            <th nzWidth="6%">总金额</th>
+            <th nzWidth="3%">模式</th>
+            <th nzWidth="3%">单价</th>
+            <th nzWidth="4%">奖金组</th>
+            <th nzWidth="3%">追停</th>
+            <th nzWidth="5%">总奖金</th>
+            <th nzWidth="10%">追号时间</th>
+            <th>IP</th>
+            <th nzWidth="5%">状态</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.lottery_name}}</td>
+            <td>{{item.method_name}}</td>
+            <td>{{item.start_issue}}</td>
+            <td>{{item.now_issue}}</td>
+            <td>{{item.end_issue}}</td>
+            <td>{{item.trace_total_cost}}</td>
+            <td>{{item.price}}</td>
+            <td>{{item.mode}}</td>
+            <td>{{item.bet_prize_group}}</td>
+            <td>
+              <span *ngIf="item.win_stop == 1" style="color: green;">是</span>
+              <span *ngIf="item.win_stop == 0" style="color: red;">否</span>
+            </td>
+            <td>{{item.total_bonus}}</td>
+            <td>{{item.time_bought}}</td>
+            <td>{{item.ip}}</td>
+            <td>
+              <span *ngIf="item.status == 0" style="color: darkslategrey;">追号中</span>
+              <span *ngIf="item.status == 1" style="color: green;">中奖停止</span>
+              <span *ngIf="item.status == 2" style="color: darkgreen;">追号完成</span>
+              <span *ngIf="item.status == 3" style="color: red;">玩家撤单</span>
+              <span *ngIf="item.status == 4" style="color: red;">管理员撤单</span>
+              <span *ngIf="item.status == 5" style="color: red;">异常撤单</span>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="page.index" [nzPageSize]="searchData['page_size']" [nzTotal]="page.total"
+        [(nzPageIndex)]="page.index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>

@@ -1,0 +1,27 @@
+@import '../../style.css';
+::ng-deep .edui-editor {
+    height: 350px;
+}
+::ng-deep .edui-default .edui-editor-iframeholder{
+    height: 220px !important;
+}
+.rule-details .tpl-input{
+    width:60px;
+}
+.rule-details-list-con{
+    margin-right: 10px;
+    float: left;
+    text-align:center;
+}
+.rule-details-box .primary{
+    position: absolute;
+    top: 33px;
+    left: 360px;
+}
+.rule-details-primary{
+    padding-top: 29px;
+    cursor: pointer;
+}
+.tpl-title{
+    width:130px;
+}

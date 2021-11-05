@@ -1,0 +1,159 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <section class="select-lottery serach-tpl">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">用户名:</span>
+          <input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData['username']" class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">是否审核:</span>
+          <nz-select nzSize="small" class="tpl-input" nzPlaceHolder="请选择" [(ngModel)]="searchData['check']"
+            nzAllowClear>
+            <nz-option nzLabel="全部" nzValue=""></nz-option>
+            <nz-option *ngFor="let item of serachOptions.check | objkeys" [nzLabel]="serachOptions.check[item]"
+              [nzValue]="item"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">奖品类型:</span>
+          <nz-select nzSize="small" class="tpl-input" nzPlaceHolder="请选择" [(ngModel)]="searchData['prize']"
+            nzAllowClear>
+            <nz-option nzLabel="全部" nzValue=""></nz-option>
+            <nz-option *ngFor="let item of serachOptions.prize | objkeys" [nzLabel]="serachOptions['prize'][item]"
+              [nzValue]="item"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">领取方式:</span>
+          <nz-select nzSize="small" class="tpl-input" nzPlaceHolder="请选择" [(ngModel)]="searchData['obtain_type']"
+            nzAllowClear>
+            <nz-option nzLabel="全部" nzValue=""></nz-option>
+            <nz-option *ngFor="let item of serachOptions.obtain_type" [nzLabel]="item['name']" [nzValue]="item['key']">
+            </nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">状态:</span>
+          <nz-select nzSize="small" class="tpl-input" nzPlaceHolder="请选择" [(ngModel)]="searchData['status']"
+            nzAllowClear>
+            <nz-option nzLabel="全部" nzValue=""></nz-option>
+            <nz-option *ngFor="let item of serachOptions.status | objkeys" [nzLabel]="serachOptions['status'][item]"
+              [nzValue]="item"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">活动类型:</span>
+          <nz-select nzSize="small" class="tpl-input" nzPlaceHolder="请选择" [(ngModel)]="searchData['type']" nzAllowClear>
+            <nz-option nzLabel="全部" nzValue=""></nz-option>
+            <nz-option *ngFor="let item of serachOptions.type" [nzLabel]="item.name" [nzValue]="item.type"></nz-option>
+          </nz-select>
+        </section>&nbsp;&nbsp;
+        <section class="tpl-list flexa">
+          <span class="tpl-title">管理员:</span>
+          <input nz-input nzSize="small" placeholder="管理员" [(ngModel)]="searchData['admin_name']" class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa tpl-list-time">
+          <span class="tpl-title tpl-title-search">审核时间:</span>
+          <nz-range-picker nzSize="small" [(ngModel)]="checkTime" (click)="checkTimeHandle()"
+            (ngModelChange)="oncCheckChange($event)" nzShowTime>
+          </nz-range-picker>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <button nzSize="small" nz-button nzType="primary" class="select-search" (click)="search()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nzSize="small" nz-button nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>
+      </section>
+      <nz-table nzShowQuickJumper #nzTable [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="10%">用户名</th>
+            <th>活动名称</th>
+            <th>活动类型</th>
+            <th>奖品类型</th>
+            <th>奖品值</th>
+            <th>条件类型</th>
+            <th>条件值</th>
+            <th>领取方式</th>
+            <th>状态</th>
+            <th>创建时间</th>
+            <th>是否需要审核</th>
+            <th>操作人</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-data [ngForOf]="tableList">
+            <tr>
+              <td>{{data.username}}</td>
+              <td>{{data.type_name}}</td>
+              <td>{{data.type}}</td>
+              <td>{{prizeType[data.prize]}}</td>
+              <td>{{data.prize_val}}</td>
+              <td>{{possibleType[data.possible]}}</td>
+              <td>{{data.possible_val}}</td>
+              <td>{{obtainType[data.obtain_type]}}</td>
+              <td>{{statusType[data.status]}}</td>
+              <td>{{data.created_at}}</td>
+              <td>{{data.check == 1 || data.obtain_type == 3? '需要审核' : '无需审核'}}</td>
+              <td>{{data.admin_name}}</td>
+              <td>
+                <button *ngIf="(data.obtain_type == 3 || data.check == 1) && data.status == 2" nz-button
+                  nzType="primary" (click)="goCheck(data)" nzSize="small">审核</button>
+                <section *ngIf="(data.obtain_type == 3 || data.check == 1) && data.status == 6">
+                  <!-- <a  href="javascript:;" class="a-link">已锁住</a> -->
+                  <button nz-button nzType="primary" (click)="checkBehavior(1, data)" nzSize="small">通过</button>
+                  <button *ngIf="data.check == 1" nz-button nzType="primary" (click)="checkBehavior(3, data)"
+                    nzSize="small">拒绝</button>
+                  <button *ngIf="data.obtain_type == 3" nz-button nzType="primary" (click)="checkBehavior(7, data)"
+                    nzSize="small">拒绝</button>
+                </section>
+                <span *ngIf="(data.obtain_type == 3 || data.check == 1) && data.status == 1" class="cgreen">已通过</span>
+                <span *ngIf="(data.obtain_type == 3 || data.check == 1) && (data.status == 3 || data.status == 7)"
+                  class="cred">已拒绝</span>
+                <span *ngIf="data.check == 2 && data.obtain_type != 3">无</span>
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+  <nz-modal [nzVisible]="check.show" nzTitle="审核" (nzOnCancel)="check.show = false" (nzOnOk)="submitHand()">
+    <!-- [nzOkLoading]="api.loadingSwitch" -->
+    <section class="tpl-list flexa">
+      <span class="tpl-title">原因:</span>
+      <input nz-input placeholder="请输入原因" class="tpl-input tpl-input-reason" [(ngModel)]="check.data['reason']" />
+    </section>
+  </nz-modal>
+  <!-- <nz-drawer
+  [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+  [nzMaskClosable]="false"
+  [nzWidth]="500"
+  [nzVisible]="check.show"
+  nzTitle="审核"
+  (nzOnClose)="check.show = false">
+  
+    <section class="drawer-box">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">状态:</span>
+        <nz-select  nzSize="normal" style="width: 120px;" [(ngModel)]="check.data['check_status']" nzAllowClear nzPlaceHolder="状态">
+          <nz-option nzValue="1" nzLabel="通过"></nz-option>
+          <nz-option nzValue="3" nzLabel="拒绝"></nz-option>
+        </nz-select>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">原因:</span>
+        <input nz-input placeholder="请输入原因" class="tpl-input tpl-input-reason" [(ngModel)]="check.data['reason']" />
+      </section>
+      <button nz-button nzType="primary" (click)="submitHand()" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer> -->
+</nz-content>

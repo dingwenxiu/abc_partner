@@ -1,0 +1,16 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <section class="tpl-list flexa">
+        <nz-upload [nzAction]="api.uploadImg" [nzData] = "{type: 7, test: 0}" (nzChange)='upavatarImgUrl($event)' [nzFileList]="fileList">
+          <button nz-button><i nz-icon nzType="upload"></i><span>上传头像</span></button>
+        </nz-upload>
+      </section>
+      <section class="tpl-list flexa">
+        <section class="img-box" *ngFor="let item of avatarImgList">
+          <img class="avatarImg" [src]="api.imgUrl + item.avatar">
+          <button nz-button (click)="deleteavatarImgUrl(item)" style="margin-top:10px"><i nz-icon nzType="delete" nzTheme="outline"></i><span>删除头像</span></button>
+        </section>
+      </section>
+    </section>
+  </section>

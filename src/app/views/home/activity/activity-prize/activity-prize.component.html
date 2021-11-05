@@ -1,0 +1,65 @@
+<nz-content style="margin:0 16px;">
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+      <button nz-button class="top-button" nzType="primary" (click)="addHandler()" nzSize="small">添加奖品</button>
+      <section class="main-content">
+        <nz-table nzShowQuickJumper #nzTable [nzShowPagination]="false" [nzData]="tableList">
+          <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="5%">ID</th>
+            <th nzWidth="10%">名称</th>
+            <th nzWidth="15%">类型</th>
+            <th nzWidth="15%">创建时间</th>
+            <th nzWidth="5%">状态</th>
+            <th nzWidth="8%">操作</th>
+          </tr>
+          </thead>
+          <tbody class="ant-table-tbody">
+          <ng-template ngFor let-data [ngForOf]="tableList">
+            <tr>
+              <td>{{data.id}}</td>
+              <td>{{data.name}}</td>
+              <td>{{data.type}}</td>
+              <td>{{data.created_at}}</td>
+              <td>
+                <span *ngIf="data.status" style="color: green;">上架</span>
+                <span *ngIf="!data.status" style="color: red;">下架</span>
+              </td>
+              <td>
+                  <a href="javascript:;" class="a-link" (click)="editHandler(data)">编辑</a>
+                  <a href="javascript:;" class="a-link" (click)="deleteHandler(data)">删除</a>
+              </td>
+            </tr>
+          </ng-template>
+          </tbody>
+        </nz-table>
+        <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+      </section>
+    </section>
+
+    <nz-drawer
+    [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false"
+    [nzWidth]="500"
+    [nzVisible]="edit.show"
+    nzTitle="编辑/添加"
+    (nzOnClose)="edit.show = false"
+  >
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">奖品名称:</span> <input required nz-input [(ngModel)]="edit.data.name" placeholder="请输入名称" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">奖品类型:</span>
+        <input required nz-input [(ngModel)]="edit.data.type" placeholder="请输入类型" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+          <span class="tpl-title">是否使用:</span>
+          <nz-switch [(ngModel)]="edit.data.status" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
+        </section>
+      <button nz-button nzType="primary" (click)="submitHandler()" [nzLoading]="edit.loading" class="submit">
+        提交
+      </button>
+    </section>
+  </nz-drawer>
+</nz-content>  

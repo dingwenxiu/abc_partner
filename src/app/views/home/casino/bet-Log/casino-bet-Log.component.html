@@ -1,0 +1,85 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <section class="select-lottery serach-tpl">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">用户名:</span>
+          <input nz-input nzSize="small" placeholder="用户名" [(ngModel)]="searchData['username']" class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">订单号:</span>
+          <input nz-input nzSize="small" placeholder="订单号" [(ngModel)]="searchData['platform_order_id']"
+            class="tpl-input" />
+        </section>
+        <section class="tpl-list flexa">
+          <span class="tpl-title">平台:</span>
+          <nz-select nzSize="small" [(ngModel)]="searchData['main_game_plat_code']" nzAllowClear
+            nzPlaceHolder="平台" class="tpl-input">
+            <nz-option [nzValue]="''" nzLabel="全部"></nz-option>
+            <nz-option *ngFor="let item of platformOptions" [nzValue]="item.code" [nzLabel]="item.name"></nz-option>
+          </nz-select>
+        </section>
+        <section class="tpl-list flexa tpl-list-time" style="width: 500px;">
+          <span class="tpl-title">时间:</span>
+          <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)"
+            (nzOnCalendarChange)="onCelen($event)" (click)="timeHandle()" nzShowTime></nz-range-picker>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa">
+          <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="search()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>ID</th>
+            <th>用户名</th>
+            <th>网站用户名</th>
+            <th>订单号</th>
+            <th>拉取时间</th>
+            <th>平台</th>
+            <th>平台类型</th>
+            <th>投注金额</th>
+            <th>状态</th>
+            <th>创建时间</th>
+            <th>更新时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.site_username}}</td>
+            <td>{{item.platform_order_id}}</td>
+            <td>{{item.pull_at}}</td>
+            <td>{{item.main_game_plat_code}}</td>
+            <td>{{item.plat_type}}</td>
+            <td>{{item.bet_amount}}</td>
+            <td>{{item.status ? '开启' : '关闭'}}</td>
+            <td>{{item.created_at}}</td>
+            <td>{{item.updated_at}}</td>
+            <td>
+              <button nz-button nzType="primary" (click)="detail(item)" nzSize="small">详情</button>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='page.size' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<nz-modal nzTitle="详情" [nzCancelText]="null" [nzOkText]="null" nzWidth="100rem" [nzVisible]="detailPop.show"
+  (nzOnCancel)="detailPop.show = false">
+  <section class="tpl-lists">
+    <nz-descriptions nzBordered>
+      <nz-descriptions-item *ngFor="let item of detailPop.data | keyValueDel" [nzTitle]="item[0]">{{item[1]}}
+      </nz-descriptions-item>
+    </nz-descriptions>
+  </section>
+</nz-modal>

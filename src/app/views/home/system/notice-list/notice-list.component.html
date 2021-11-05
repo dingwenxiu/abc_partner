@@ -1,0 +1,119 @@
+<nz-content style="margin:0 16px;">
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+      <button nz-button nzType="primary" (click)="addNotice(0,{})" nzSize="small" class="top-button">添加公告</button>&nbsp;&nbsp;&nbsp;
+      <button nz-button nzType="primary" (click)="doFlush()" nzSize="small" class="top-button">刷新缓存</button>
+      <section class="main-content">
+        <nz-table nzShowQuickJumper [nzShowPagination]="false" #tableData [nzData]="tableList">
+          <thead class="ant-table-thead">
+            <tr>
+              <th nzWidth="5%">ID</th>
+              <th nzWidth="15%">
+                标题
+              </th>
+              <th nzWidth="10%">公告类型</th>
+              <th nzWidth="5%">设备</th>
+              <th nzWidth="5%">置顶</th>
+              <th nzWidth="13%">内容摘要</th>
+              <th nzWidth="10%">开始时间</th>
+              <th nzWidth="10%">结束时间</th>
+              <th nzWidth="5%">添加人ID</th>
+              <th nzWidth="5%">状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody class="ant-table-tbody">
+            <tr *ngFor="let item of tableList" (click)="lockTd($event)">
+              <td>{{item.id}}</td>
+              <td>
+                <p class="text-content">
+                  {{item.title}}
+                </p>
+              </td>
+              <td>{{item.type_desc}}</td>
+              <td>{{item.device_type_desc}}</td>
+              <td>{{item.top_score ? '是' : '否'}}</td>
+              <td id="text-content">
+                <p class="fw text-content" [innerHtml]="item.content"></p>
+              </td>
+              <td>{{item.start_time}}</td>
+              <td>{{item.end_time}}</td>
+              <td>{{item.add_partner_admin_id}}</td>
+              <td>
+                <ng-container *ngIf="item.status == 1; else elseTemplate">
+                  <i class="fa fa-check txt-color-green"></i>
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <i class="fa fa-times txt-color-red"></i>
+                </ng-template>
+              </td>
+              <td id="operating">
+                <button nz-button nzSize="small" class="control-button" nzType="primary" (click)="addNotice(item.id, item)">编辑</button>
+                <button nz-button nzSize="small" class="control-button" nzType="primary" (click)="doStatus(item.id)">{{item.status == 1 ? '禁用' : '开启'}}</button>
+                <button nz-button nzSize="small" class="control-button" nzType="primary" (click)="doTop(item.id)">置顶</button>
+                <button nz-button nzSize="small" class="control-button" nzType="primary" (click)="deleteNotice(item)">删除</button>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+        <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+          (nzPageIndexChange)="pageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+      </section>
+    </section>
+  </nz-content>
+
+<!-- 添加公告 -->
+<nz-drawer
+[nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+[nzMaskClosable]="false"
+[nzWidth]="720"
+[nzVisible]="addNoticePop.pop"
+nzTitle="公告设置"
+(nzOnClose)="addNoticePop.pop = false"
+>
+  <section class="tpl-lists">
+    <section class="tpl-list flexa" >
+      <span class="tpl-title">公告类型:</span>
+      <nz-select [(ngModel)]="addData.data.type"  nzPlaceHolder="选择公告类型" class="tpl-input" nzAllowClear>
+        <nz-option *ngFor="let item of typeOption;" [nzValue]="item.key" [nzLabel]="item.value"></nz-option>
+      </nz-select>
+    </section>
+    <section class="tpl-list flexa" >
+      <span class="tpl-title">设备类型:</span>
+      <nz-select [(ngModel)]="addData.data.device_type"  nzPlaceHolder="选择设备类型" class="tpl-input" nzAllowClear>
+        <nz-option *ngFor="let option of deviceTypeOption | keyvalue" [nzValue]="option.key" [nzLabel]="option.value"></nz-option>
+      </nz-select>
+    </section>
+
+    <section class="tpl-list flexa">
+      <span class="tpl-title">标题:</span> <input nz-input  [(ngModel)]="addData.data.title" placeholder="请输入标识" class="tpl-input" />
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">说明:</span> <input nz-input  [(ngModel)]="addData.data['type_desc']" placeholder="请输入说明" class="tpl-input" />
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">内容:</span>
+      <ueditor style="width:500px;" #full [(ngModel)]="addData.data.content" [config]="{ wordCount: true }" [loadingTip]="'加载中……'" (onReady)="_ready($event)" (onDestroy)="_destroy()"
+      (ngModelChange)="_change($event)"></ueditor>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">开始时间:</span>
+      <nz-date-picker  [(ngModel)]="addData.data.start_time" nzShowTime></nz-date-picker>
+    </section>
+    <section class="tpl-list flexa">
+      <span class="tpl-title">结束时间:</span>
+      <nz-date-picker [(ngModel)]="addData.data.end_time" nzShowTime></nz-date-picker>
+    </section>
+    <button nz-button nzType="primary" (click)="submitNotice()" [nzLoading]="addData.buttonLoading" class="submit">
+      提交
+    </button>
+  </section>
+</nz-drawer>
+
+<nz-modal
+[(nzVisible)]="contentPop.show"
+[nzCancelText]="null"
+[nzOkText]="null"
+nzTitle="内容提示" 
+(nzOnCancel)="contentPop.show = false">
+  <section class="fw content" [innerHtml]="contentPop.data"></section>
+</nz-modal>

@@ -1,0 +1,123 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <nz-table nzShowQuickJumper #nzTable [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>订单ID</th>
+            <th>用户名</th>
+            <th>金额</th>
+            <th>请求原因</th>
+            <th>请求状态</th>
+            <th>返回原因</th>
+            <th>返回状态</th>
+            <th>IP</th>
+            <th>创建时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <ng-template ngFor let-data [ngForOf]="tableList">
+            <tr (click)="lockTd($event)">
+              <td>{{data.order_id}}</td>
+              <td>{{data.username}}</td>
+              <td>{{data.amount}}</td>
+              <td>{{data.request_reason}}</td>
+              <td>
+                <span style="color: red;" *ngIf='data.request_status === 0'>
+                  等待审核
+                </span>
+                <span style="color: red;" *ngIf='data.request_status === 1'>
+                  领取审核
+                </span>
+                <span style="color: green;" *ngIf='data.request_status === 2'>
+                  审核成功
+                </span>
+                <span style="color: green;" *ngIf='data.request_status === 3'>
+                  代付成功
+                </span>
+                <span style="color: green;" *ngIf='data.request_status === 4'>
+                  回调成功
+                </span>
+                <span style="color: green;" *ngIf='data.request_status === 5'>
+                  人工成功
+                </span>
+                <span style="color: dodgerblue;" *ngIf='data.request_status === -2'>
+                  审核失败
+                </span>
+                <span style="color: dodgerblue;" *ngIf='data.request_status === -3'>
+                  代付失败
+                </span>
+                <span style="color: dodgerblue;" *ngIf='data.request_status === -4'>
+                  回调失败
+                </span>
+                <span style="color: dodgerblue;" *ngIf='data.request_status === -5'>
+                  人工失败
+                </span>
+              </td>
+              <td>{{data.back_reason}}</td>
+              <td>
+                <span style="color: red;" *ngIf='data.back_status === 0'>
+                  等待审核
+                </span>
+                <span style="color: green;" *ngIf='data.back_status === 1'>
+                  领取审核
+                </span>
+                <span style="color: green;" *ngIf='data.back_status === 2'>
+                  审核成功
+                </span>
+                <span style="color: green;" *ngIf='data.back_status === 3'>
+                  代付成功
+                </span>
+                <span style="color: green;" *ngIf='data.back_status === 4'>
+                  回调成功
+                </span>
+                <span style="color: green;" *ngIf='data.back_status === 5'>
+                  人工成功
+                </span>
+                <span style="color: dodgerblue;" *ngIf='data.back_status === -2'>
+                  审核失败
+                </span>
+                <span style="color: dodgerblue;" *ngIf='data.back_status === -3'>
+                  代付失败
+                </span>
+                <span style="color: dodgerblue;" *ngIf='data.back_status === -4'>
+                  回调失败
+                </span>
+                <span style="color: dodgerblue;" *ngIf='data.back_status === -5'>
+                  人工失败
+                </span>
+              </td>
+              <td>{{data.ip}}</td>
+              <td>{{data.created_at}}</td>
+              <td>
+                <button nz-button nzSize="small" nzType="primary" (click)="withdrawLogDetail(data.order_id)" nzSize="small">详情</button>
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+
+<nz-modal 
+nzTitle = "详情"
+[nzCancelText]="null"
+[nzOkText]="null"
+nzWidth="100rem"
+[nzVisible] = "detailPop.show"
+(nzOnCancel) = "detailPop.show = false">
+  <section class="tpl-lists">
+    <nz-descriptions nzBordered nzTitle="日志详情">
+      <nz-descriptions-item *ngFor="let item of detailPop.data | keyValueDel: 'withdrawLog'" [nzTitle]="item[0]">{{item[1]}}</nz-descriptions-item>
+    </nz-descriptions>
+    <nz-descriptions nzBordered nzTitle="请求详情">
+      <nz-descriptions-item *ngFor="let item of detailPop.data['request_params'] || {} | keyValueDel: 'withdrawLog'" [nzTitle]="item[0]">{{item[1]}}</nz-descriptions-item>
+    </nz-descriptions>
+    <nz-descriptions nzBordered nzTitle="请求返回">
+      <nz-descriptions-item *ngFor="let item of detailPop.data['request_back'] || {} | keyValueDel: 'withdrawLog'" [nzTitle]="item[0]">{{item[1]}}</nz-descriptions-item>
+    </nz-descriptions>
+  </section>
+</nz-modal>

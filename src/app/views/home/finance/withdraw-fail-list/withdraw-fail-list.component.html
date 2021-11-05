@@ -1,0 +1,219 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <section class="main-content">
+      <section class="select-lottery serach-tpl">
+          <section class="tpl-list flexa">
+            <span class="tpl-title tpl-title-search">ID查询:</span>
+            <input nz-input placeholder="ID查询" [(ngModel)]="searchData['id']" class="tpl-input"
+              nzSize="small" />&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title tpl-title-search">用户ID:</span>
+            <input nz-input placeholder="用户ID" [(ngModel)]="searchData['user_id']" class="tpl-input"
+              nzSize="small" />&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title tpl-title-search">用户身份:</span>
+            <nz-select [(ngModel)]="searchData['frozen_type']" nzAllowClear nzPlaceHolder="请选择状态" class="tpl-input"
+              nzSize="small">
+              <nz-option nzValue="" nzLabel="全部"></nz-option>
+              <nz-option nzValue="black_list" nzLabel="黑名单"></nz-option>
+              <nz-option nzValue="nomal_user" nzLabel="正常用户"></nz-option>
+            </nz-select>&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title tpl-title-search">状态:</span>
+            <nz-select [(ngModel)]="searchData['status']" nzAllowClear nzPlaceHolder="请选择状态" class="tpl-input"
+              nzSize="small">
+              <nz-option nzValue="" nzLabel="全部"></nz-option>
+              <nz-option nzValue="0" nzLabel="等待审核"></nz-option>
+              <nz-option nzValue="1" nzLabel="领取审核"></nz-option>
+              <nz-option nzValue="2" nzLabel="审核成功"></nz-option>
+              <nz-option nzValue="3" nzLabel="代付成功"></nz-option>
+              <nz-option nzValue="4" nzLabel="回调成功"></nz-option>
+              <nz-option nzValue="5" nzLabel="人工成功"></nz-option>
+              <nz-option nzValue="-2" nzLabel="审核失败"></nz-option>
+              <nz-option nzValue="-3" nzLabel="代付失败"></nz-option>
+              <nz-option nzValue="-4" nzLabel="回调失败"></nz-option>
+              <nz-option nzValue="-5" nzLabel="人工失败"></nz-option>
+            </nz-select>&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title tpl-title-search">测试玩家:</span>
+            <nz-select [(ngModel)]="searchData['is_tester']" nzAllowClear nzPlaceHolder="是否测试玩家" class="tpl-input"
+              nzSize="small">
+              <nz-option nzValue="" nzLabel="全部"></nz-option>
+              <nz-option nzValue="1" nzLabel="是"></nz-option>
+              <nz-option nzValue="0" nzLabel="否"></nz-option>
+            </nz-select>&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title tpl-title-search">管理员ID:</span>
+            <input nz-input placeholder="请输入审核管理员ID" [(ngModel)]="searchData['check_admin_id']" class="tpl-input"
+              nzSize="small" />&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title tpl-title-search">网络地址:</span>
+            <input nz-input placeholder="网络地址" [(ngModel)]="searchData['client_ip']" class="tpl-input"
+              nzSize="small" />&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title tpl-title-search">银行名称:</span>
+            <nz-select [(ngModel)]="searchData['bank_sign']" nzAllowClear nzPlaceHolder="银行名称" class="tpl-input"
+              nzSize="small">
+              <nz-option nzValue="" nzLabel="全部"></nz-option>
+              <nz-option *ngFor="let item of bankSignOption" [nzValue]="item.key" [nzLabel]="item.label"></nz-option>
+            </nz-select>&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title tpl-title-search">订单编号:</span>
+            <input nz-input placeholder="订单编号" [(ngModel)]="searchData['order_id']" class="tpl-input"
+              nzSize="small" />&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa">
+            <span class="tpl-title tpl-title-search">金额区间:</span>
+            <nz-input-group nzCompact class="tpl-input" nzSize="small">
+              <input type="text" nz-input [(ngModel)]="searchData['min']" style="width:92px;" placeHolder="金额最小"
+                nzSize="small" />-
+              <input type="text" nz-input [(ngModel)]="searchData['max']" style="width:92px;" placeHolder="金额最大"
+                nzSize="small" />
+            </nz-input-group>&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa tpl-list-time">
+            <span class="tpl-title tpl-title-search">申请时间:</span>
+            <nz-range-picker nzSize="small" [(ngModel)]="requestTime" (click)="requestTimeHandle()" (ngModelChange)="onRequestChange($event)" nzShowTime>
+            </nz-range-picker>&nbsp;&nbsp;
+          </section>
+          <section class="tpl-list flexa tpl-list-time">
+            <span class="tpl-title tpl-title-search">审核时间:</span>
+            <nz-range-picker nzSize="small" [(ngModel)]="checkTime" (click)="checkTimeHandle()" (ngModelChange)="oncCheckChange($event)" nzShowTime>
+            </nz-range-picker>&nbsp;&nbsp;
+            <button nz-button nzType="primary" class="select-search" (click)="serach()" nzSize="small"><i nz-icon
+                type="search"></i>搜索</button>&nbsp;&nbsp;
+            <button nz-button nzType="primary" class="select-reset" (click)="resetSearch()" nzSize="small"><i nz-icon
+                type="sync"></i>重置</button>
+          </section>
+      </section>
+      <nz-table nzShowQuickJumper [nzPageSize]="searchData.page_size" [nzShowPagination]="false" #tableData
+        [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th>ID</th>
+            <th nzWidth="5%">用户ID</th>
+            <th nzWidth="8%">昵称</th>
+            <th nzWidth="7%">订单号</th>
+            <th nzWidth="8%">提现金额</th>
+            <th nzWidth="8%">实际金额</th>
+            <th nzWidth="8%">银行</th>
+            <th nzWidth="10%">审核时间</th>
+            <th nzWidth="10%">申请时间</th>
+            <th nzWidth="10%">处理时间</th>
+            <th nzWidth="8%">请求IP</th>
+            <th nzWidth="6%">状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.id}}</td>
+            <td>{{item.user_id}}</td>
+            <td>{{item.nickname}}</td>
+            <td>{{item.order_id}}</td>
+            <td>{{item.amount}}</td>
+            <td>{{item.real_amount}}</td>
+            <td>{{item.bank_name}}</td>
+            <td>{{item.check_time}}</td>
+            <td>{{item.request_time}}</td>
+            <td>{{item.process_time}}</td>
+            <td>{{item.client_ip}}</td>
+            <td>
+              <span style="color: red;" *ngIf='item.status === -2'>
+                审核失败
+              </span>
+              <span style="color: red;" *ngIf='item.status === -3'>
+                代发失败
+              </span>
+              <span style="color: red;" *ngIf='item.status === -4'>
+                回调失败
+              </span>
+              <span style="color: red;" *ngIf='item.status === -5'>
+                人工失败
+              </span>
+              <span *ngIf='item.status === 0'>
+                等待审核
+              </span>
+              <span style="color: dodgerblue;" *ngIf='item.status === 1'>
+                领取审核
+              </span>
+              <span style="color: dodgerblue;" *ngIf='item.status === 2'>
+                审核成功
+              </span>
+              <span style="color: dodgerblue;" *ngIf='item.status === 3'>
+                代发成功
+              </span>
+              <span style="color: green;" *ngIf='item.status === 4'>
+                回调成功
+              </span>
+              <span style="color: green;" *ngIf='item.status === 5'>
+                人工成功
+              </span>
+            </td>
+            <td>
+              <button nz-button nzSize="small" nzType="primary" (click)="doDetail(item)" nzSize="small">详情</button>
+              <button nz-button *ngIf="item.status === 0" nzSize="small" nzType="primary" (click)="doHand(item)" nzSize="small">着手处理</button>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3" style="color: green;">本页统计:</td>
+            <td></td>
+            <td>{{totalPageAmount}}</td>
+            <td>{{totalPageRealAmount}}</td>
+            <td colspan="7"></td>
+          </tr>
+          <tr>
+            <td colspan="3" style="color: green;">总计:</td>
+            <td></td>
+            <td></td>
+            <td>{{totalRealAmount}}</td>
+            <td colspan="7"></td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageIndex]="1" [nzPageSize]='searchData.page_size' [nzTotal]="page.total"
+        [(nzPageIndex)]="searchData.page_index" (nzPageIndexChange)="doPageChange()" nzShowQuickJumper
+        class="nz-pagination">
+      </nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<nz-modal 
+nzTitle = "详情"
+[nzCancelText]="null"
+[nzOkText]="null"
+nzWidth="100rem"
+[nzVisible] = "detailPop.show"
+(nzOnCancel) = "detailPop.show = false">
+  <section class="tpl-lists">
+    <nz-descriptions nzBordered nzTitle="">
+      <nz-descriptions-item *ngFor="let item of detailPop.data | keyValueDel: 'withdraw' " [nzTitle]="item[0]">{{item[1]}}</nz-descriptions-item>
+    </nz-descriptions>
+  </section>
+</nz-modal>
+
+<nz-modal 
+nzTitle = "处理"
+(nzOnOk)="subHank()"
+nzWidth="35rem"
+[nzVisible] = "handPop.show"
+(nzOnCancel) = "handPop.show = false">
+  <section class="tpl-lists">
+    <section class="tpl-list flexa">
+        <span class="tpl-title">类型:</span>
+        <nz-select style="width: 300px;" [(ngModel)]="handPop.data['type']" [nzPlaceHolder]="'请选择类型'"
+          nzAllowClear>
+          <nz-option nzValue="1" nzLabel="领取审核"></nz-option>
+        </nz-select>
+      </section>
+  </section>
+</nz-modal>

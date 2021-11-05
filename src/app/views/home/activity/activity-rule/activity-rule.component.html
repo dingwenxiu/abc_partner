@@ -1,0 +1,89 @@
+<nz-content style="margin:0 16px;">
+    <section style="padding:12px; background: #fff; min-height: 360px;">
+      <!-- <button nz-button nzType="primary" (click)="addHandler()" nzSize="small">添加规则</button> -->
+      <section class="main-content">
+        <nz-table nzShowQuickJumper #nzTable [nzShowPagination]="false" [nzData]="tableList">
+          <thead class="ant-table-thead">
+          <tr>
+            <th>活动ID</th>
+            <th>名称</th>
+            <!-- <th>参数列表</th> -->
+          </tr>
+          </thead>
+          <tbody class="ant-table-tbody">
+            <ng-template ngFor let-data [ngForOf]="tableList">
+              <tr (click)="lockTd($event)">
+                <td>{{data.id}}</td>
+                <td>{{data.name}}</td>
+                <!-- <td>
+                  <p class="text-content">
+                    {{data.params}}
+                  </p>
+                </td> -->
+              </tr>
+            </ng-template>
+          </tbody>
+        </nz-table>
+        <nz-pagination [nzPageIndex]="1" [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+      </section>
+    </section>
+
+    <nz-drawer
+    [nzBodyStyle]="{ height: 'calc(100% - 55px)', overflow: 'auto', 'padding-bottom': '53px' }"
+    [nzMaskClosable]="false"
+    [nzWidth]="800"
+    [nzVisible]="edit.show"
+    nzTitle="编辑/添加"
+    (nzOnClose)="edit.show = false"
+  >
+    <section class="tpl-lists">
+      <section class="tpl-list flexa">
+        <span class="tpl-title">名称:</span> <input required nz-input [(ngModel)]="edit.data.name" placeholder="请输入名称" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">描述:</span> <input nz-input  [(ngModel)]="edit.data.description" placeholder="请输入描述" class="tpl-input" />
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">所属活动:</span> 
+        <nz-select  nzSize="small" style="width: 120px;" [(ngModel)]="edit.data.activity_id" nzAllowClear nzPlaceHolder="所属活动">
+            <nz-option  *ngFor="let item of activity_options" [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+          </nz-select>
+      </section>
+      <section class="tpl-list flexa pr rule-details-box">
+        <span class="tpl-title">详情:</span>
+        <ul class="rule-details">
+          <li *ngFor="let item of rule_details; let index = index">
+            <section class="rule-details-list-con">
+                <span class="dl">field</span>
+                <input nz-input type="text" class="tpl-input" [(ngModel)]="item.field" style="width:100px;">
+            </section>
+            <section class="rule-details-list-con">
+                <span class="dl">value</span>
+                <input nz-input type="text" class="tpl-input" [(ngModel)]="item.value" style="width:100px;">
+            </section>
+            <section class="rule-details-list-con">
+                <span class="dl">remark</span>
+                <input nz-input type="text" class="tpl-input" [(ngModel)]="item.remark" style="width:250px;">
+            </section>
+            <section class="rule-details-list-con" *ngIf="index !== 0">
+                <i nz-icon nzType="minus" nzTheme="outline" class="rule-details-primary" (click)="reduceHandler(index)"></i>
+            </section>
+          </li>
+        </ul>
+        <a href="javascript:;" class="a-link" (click)="addRuleDetails()">新增</a>
+      </section>
+      <section class="tpl-list flexa">
+        <span class="tpl-title">标记:</span>
+        <input nz-input [(ngModel)]="edit.data.rule_sign" placeholder="请输入标记" class="tpl-input" />
+      </section>
+    </section>
+  </nz-drawer>
+</nz-content>  
+
+<nz-modal [(nzVisible)]="contentPop.show" [nzCancelText]="null" [nzOkText]="null" nzTitle="内容提示"
+  (nzOnCancel)="contentPop.show = false">
+  <section class="fw content">
+    {{contentPop.data}}
+  </section>
+</nz-modal>

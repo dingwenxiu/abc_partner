@@ -1,0 +1,106 @@
+<nz-content style="margin:0 16px;">
+  <section style="padding:12px; background: #fff; min-height: 360px;">
+    <button nz-button class="top-button" nzType="primary" (click)="export(1)" nzSize="small">导出当前搜索内容</button>
+    &nbsp;&nbsp;
+    <button nz-button class="top-button" nzType="primary" (click)="export(0)" nzSize="small"><i nz-icon
+        nzType="download"></i>导出当前页</button>
+    <section class="main-content">
+      <section class="select-lottery serach-tpl">
+        <section class="tpl-list flexa">
+          <span class="tpl-title">游戏系列:</span>
+          <nz-cascader nzSize="small" [nzOptions]="lotteryOption" [(ngModel)]="defaultSelect"
+            (ngModelChange)="doSelectLottery($event)" class="tpl-input"></nz-cascader>&nbsp;&nbsp;
+        </section>
+        <section class="tpl-list flexa tpl-list-time">
+          <span class="tpl-title">时间:</span>
+          <nz-range-picker nzSize="small" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)"
+            [nzFormat]="'yyyyMMdd'"></nz-range-picker>&nbsp;&nbsp;
+          <button nz-button nzSize="small" nzType="primary" class="select-search" (click)="search()"><i nz-icon
+              type="search"></i>搜索</button>&nbsp;&nbsp;
+          <button nz-button nzSize="small" nzType="primary" class="select-reset" (click)="resetSearch()"><i nz-icon
+              type="sync"></i>重置</button>
+        </section>
+      </section>
+      <nz-table nzShowQuickJumper [nzShowPagination]="false" [nzData]="tableList">
+        <thead class="ant-table-thead">
+          <tr>
+            <th nzWidth="9%">游戏</th>
+            <th nzWidth="6%">日期</th>
+            <th nzWidth="8%">投注</th>
+            <th nzWidth="7%">单挑扣除</th>
+            <th nzWidth="7%">限额扣除</th>
+
+            <th nzWidth="8%">奖金</th>
+            <th nzWidth="6%">撤单</th>
+            <th nzWidth="6%">和反</th>
+            <th nzWidth="7%">下级返点</th>
+            <th nzWidth="7%">投注返点</th>
+            <th nzWidth="10%">盈亏</th>
+          </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+          <tr *ngFor="let item of tableList">
+            <td>{{item.lottery_name}}</td>
+            <td>{{item.day}}</td>
+            <td><span style="color: green;">{{item.bets}}</span></td>
+            <td><span style="color: green;">{{item.challenge_reduce}}</span></td>
+            <td><span style="color: green;">{{item.limit_reduce}}</span></td>
+
+
+            <td><span  style="color: red;">{{item.bonus}}</span></td>
+            <td><span style="color: red;">{{item.he_return}}</span></td>
+            <td><span style="color: red;">{{item.cancel}}</span></td>
+            <td><span style="color: red;">{{item.commission_from_child}}</span></td>
+            <td><span style="color: red;">{{item.commission_from_bet}}</span></td>
+
+            <td>{{item.profit * -1}}</td>
+          </tr>
+          <tr>
+            <td style="color: green;">本页总计:</td>
+            <td></td>
+            <td style="color: green;">{{pageStat['page_bets']}}</td>
+            <td style="color: green;">{{pageStat['page_challenge_reduce']}}</td>
+            <td style="color: green;">{{pageStat['page_limit_reduce']}}</td>
+            <td style="color: red;">{{pageStat['page_bonus']}}</td>
+            <td style="color: red;">{{pageStat['page_he_return']}}</td>
+            <td style="color: red;">{{pageStat['page_cancel']}}</td>
+            <td style="color: red;">{{pageStat['page_commission_from_child']}}</td>
+            <td style="color: red;">{{pageStat['page_commission_from_bet']}}</td>
+            <td>{{pageStat['page_profit'] * -1}}</td>
+          </tr>
+          <tr>
+            <td style="color: green;">总计:</td>
+            <td></td>
+            <td style="color: green;">{{totalStat['total_bets']}}</td>
+            <td style="color: green;">{{totalStat['total_challenge_reduce']}}</td>
+            <td style="color: green;">{{totalStat['total_limit_reduce']}}</td>
+            <td style="color: red;">{{totalStat['total_bonus']}}</td>
+            <td style="color: red;">{{totalStat['total_he_return']}}</td>
+            <td style="color: red;">{{totalStat['total_cancel']}}</td>
+            <td style="color: red;">{{totalStat['total_commission_from_child']}}</td>
+            <td style="color: red;">{{totalStat['total_commission_from_bet']}}</td>
+            <td>{{totalStat['total_profit'] * -1}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <nz-pagination [nzPageSize]='api.pageSize' [nzTotal]="page.total" [(nzPageIndex)]="page.index"
+        (nzPageIndexChange)="doPageChange()" nzShowQuickJumper class="nz-pagination"></nz-pagination>
+    </section>
+  </section>
+</nz-content>
+
+<nz-modal [(nzVisible)]="exportPop.show" nzTitle="导出" (nzOnCancel)="exportPop.show = false" [nzOkText]="null"
+  [nzCancelText]="null">
+  <ng-container *ngIf="!exportPop.loading; else elseTemplate">
+    <section class="export-content">
+      <button nz-button nzType="primary" nzSize="large" style="width: 30rem" (click)="exportAllPage()"><i nz-icon
+          nzType="download"></i>Download</button>
+    </section>
+  </ng-container>
+  <ng-template #elseTemplate>
+    <section class="export-content">
+      <button nz-button nzType="primary" nzSize="large" style="width: 30rem" (click)="stopDownload()"><i nz-icon
+          [nzType]="'sync'" [nzSpin]="true"></i>停止下载</button>
+    </section>
+  </ng-template>
+</nz-modal>

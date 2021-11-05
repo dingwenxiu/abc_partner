@@ -1,0 +1,30 @@
+@import '../../style.css';
+
+.table-tr td,
+.table-tr span{
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+}
+
+.tpl-title{
+    width: 75px;
+}
+
+.tpl-list{
+    width: 290px;
+}
+.tpl-list-time{
+    width: 460px;
+}
+
+.tpl-input{
+    width: 200px;
+}
+
+.export-content{
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+}
